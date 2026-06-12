@@ -17,7 +17,11 @@ Have the environment ready and the Git repo working
 Solution: Ask to copilot, organize without spaces, and try all the possible mistakes.
 - Install the libraries without a virtual environment.
 Solution: Create the virtual environment (watch out with problem with the versions in other projects)
-
+- Problems with the git push due to changes in both branch (local, and repository)
+Solution: force the push
+Take on count: Always that I make a change in my online repo, I need to pull it in my local repo
+- The git pull delete almost all the the files-
+Solution: A commit I made prior of it save me, with a re flog and a checkout, I recovered my changes. (WARNING: watch out with the pull without saving) 
 ## 💡 learned
 - Useful files for the Python project structure connected with a GitHub repository like Makedir, git ignore, LICENSE, and READ ME.
 - How to create my own repository in GitHub.
