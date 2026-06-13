@@ -11,6 +11,7 @@ Have the environment ready and the Git repo working
 - [x] Python and VS code
 - [x] Create the repo in GitHub
 - [x] The folders structure is ready
+- The structure is taking on count the tool: [[Structuring your project]]
 
 ## 🧱 Headaches
 - The Makedir wasn't working 

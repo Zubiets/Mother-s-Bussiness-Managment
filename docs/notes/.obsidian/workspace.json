@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Daily/Set up environment day.md",
+                "file": "1. Daily/1.5 pass day.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Set up environment day"
+              "title": "1.5 pass day"
             }
           }
         ]
@@ -180,15 +180,28 @@
       "bases:Create new base": false
     }
   },
-  "active": "0a5e2fa296d1f7a4",
+  "active": "9533e445edf37e8f",
   "lastOpenFiles": [
+    "1. Daily/1 Set up environment day.md",
+    "1. Daily/1.5 pass day.md",
+    "4. Web tools/Structuring your project.md",
+    "2. Modules/Database details.md",
+    "2. Modules/Inventory.md",
+    "2. Modules/**Quick explain**.md",
+    "2. Modules/Reporting.md",
+    "2. Modules/POS.md",
+    "3. Bugs/Bugs details.md",
+    "Modules/Untitled.canvas",
+    "Modules/Untitled.base",
+    "Base-de-datos.md",
+    "README.md",
+    "Pasted image 20260613031848.png",
     "Untitled.md",
-    "Daily/Set up environment day.md",
-    "Web tools",
+    "4. Web tools",
     "Week_1/Untitled.base",
-    "Bugs",
-    "Modules",
-    "Daily",
+    "3. Bugs",
+    "2. Modules",
+    "1. Daily",
     "Week_1",
     "Welcome.md",
     "create a link.md"
