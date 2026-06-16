@@ -14,4 +14,4 @@ Descripción en 2-3 líneas de qué resuelve.
 - [ ] Validar que el precio no sea negativo
 
 ## Links
-[[Database details]][[POS]]
+[[Database details]] [[POS]]
