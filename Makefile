@@ -6,5 +6,5 @@ init:
 venv:	
 	. venv/bin/activate
 
-test:	
-	pytest tests/
+test:
+	python -m pytest

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "4. Web tools/SQLite3 documentation.md",
+                "file": "2. Modules/Database details.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SQLite3 documentation"
+              "title": "Database details"
             }
           }
         ]
@@ -182,11 +182,12 @@
   },
   "active": "9533e445edf37e8f",
   "lastOpenFiles": [
-    "4. Web tools/Structuring your project.md",
-    "4. Web tools/SQLite3 documentation.md",
     "1. Daily/2 SQL DESIGN.md",
-    "1. Daily/1 Set up environment day.md",
     "1. Daily/1.5 pass days.md",
+    "4. Web tools/Python official documentation.md",
+    "4. Web tools/SQLite3 documentation.md",
+    "4. Web tools/Structuring your project.md",
+    "1. Daily/1 Set up environment day.md",
     "3332-03-31.md",
     "2. Modules/Database details.md",
     "2. Modules/Inventory.md",

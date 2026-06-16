@@ -1,5 +1,5 @@
 ## Description
-SQLite3 is the library that will be useful for connect and execute SQL code into our principal database
+SQLite3 is the library that will be useful for connect and execute SQL code into our principal database.
 
 ## Link:
 - Page:

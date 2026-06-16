@@ -1,18 +1,16 @@
 ## What does make?
-Descripción en 2-3 líneas de qué resuelve.
+The database will save the information that will be manipulated in the app into SQL tebles. This is probably the most important part for a inventory manage app. it will be a SQLite3 database because we can save information in a local way.
 
-## Files
-- `ui/inventory_view.py`
-- `database/models.py`
+## File
+- inventory.db
 ## Table structure
 
+
 ## Technical decisions
-- Usé CTkScrollableFrame porque la lista de productos puede ser larga
-- La búsqueda filtra en tiempo real con el evento KeyRelease
+
 
 ## To do
-- [ ] Agregar paginación si hay más de 100 productos
-- [ ] Validar que el precio no sea negativo
 
-## Links
-[[Base-de-datos]] [[POS]]
+
+## relational Links
+[[Inventory]] [[POS]] [[Reporting]]
