@@ -1,4 +1,4 @@
-from .database import inventory, create_tables
+from .database import *
 
+# Create tables when the app starts
 create_tables()
-inventory.disconnect()

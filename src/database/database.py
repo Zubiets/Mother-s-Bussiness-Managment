@@ -1,6 +1,6 @@
 import sqlite3
 
-# model to manipulate the database with code
+# model to manipulate easier the database 
 class Database:
     def __init__(self, db_path):
         self.db_path = db_path
@@ -46,19 +46,18 @@ class Database:
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
         self.execute_query(query, tuple(item_data.values()))
     
-    def get_items(self, table_name):
-        query = f"SELECT * FROM {table_name}"
-        return self.execute_query(query)
-    
-    def delete_item(self, table_name, item_id):
-        query = f"DELETE FROM {table_name} WHERE id = ?"
-        self.execute_query(query, (item_id,))
+    def update_item(self, table_name, item_id, update_data):
+        set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
+        query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
+        self.execute_query(query, tuple(update_data.values()) + (item_id,))
 
+# Create an instance of the Database class and connect to the database
 inventory = Database('data/inventory.db')
 inventory.connect()
+
+# create the tables using the database model
 def create_tables():
-    # create the tables using the database model
-    inventory.create_table('product_categories', {
+    inventory.create_table('categories', {  # different important parts from the local
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'supplier_id': 'INTEGER NOT NULL',
@@ -76,26 +75,32 @@ def create_tables():
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'category_id': 'INTEGER NOT NULL',
         'name': 'TEXT NOT NULL',
-        'quantity': 'INTEGER NOT NULL',
         'price': 'REAL NOT NULL',
         'qr_code': 'TEXT NOT NULL',
-        'FOREIGN KEY(category_id)': 'REFERENCES sales_categories(id)'
+        'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
     })
 
     inventory.create_table('sales', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'discount': 'REAL NOT NULL DEFAULT 0',
+        'total_price': 'REAL NOT NULL',
+        'date': 'DATE NOT NULL',
+        'time': 'TIME NOT NULL'
+    })
+
+    inventory.create_table('sale_details', {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'sale_id': 'INTEGER NOT NULL',
         'product_id': 'INTEGER NOT NULL',
         'quantity': 'INTEGER NOT NULL',
-        'discount': 'REAL NOT NULL',
-        'total_price': 'REAL NOT NULL',
-        'date': 'TEXT NOT NULL',
+        'price': 'REAL NOT NULL',
+        'FOREIGN KEY(sale_id)': 'REFERENCES sales(id)',
         'FOREIGN KEY(product_id)': 'REFERENCES products(id)'
     })
 
     inventory.create_table('users', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'username': 'TEXT NOT NULL',
-        'email': 'TEXT NOT NULL',
         'password': 'TEXT NOT NULL'
     })
 
@@ -109,7 +114,7 @@ def create_tables():
     inventory.create_table('time_working', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'employee_id': 'INTEGER NOT NULL',
-        'date': 'TEXT NOT NULL',
+        'date': 'DATE NOT NULL',
         'hours_worked': 'REAL NOT NULL',
         'FOREIGN KEY(employee_id)': 'REFERENCES employees(id)'
     })
@@ -117,16 +122,14 @@ def create_tables():
     inventory.create_table('expenses', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
-        'type_id': 'INTEGER NOT NULL',
+        'category_id': 'INTEGER NOT NULL',
         'amount': 'REAL NOT NULL',
-        'date': 'TEXT NOT NULL'
+        'date': 'DATE NOT NULL',
+        'time': 'TIME NOT NULL',
+        'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
     })
 
-    inventory.create_table('expense_types', {
-        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'name': 'TEXT NOT NULL',
-        'description': 'TEXT'
-    })   
+
 
 
 

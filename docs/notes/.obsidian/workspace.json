@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2. Modules/Database details.md",
+                "file": "2. Modules/Database structure.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Database details"
+              "title": "Database structure"
             }
           }
         ]
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "right": {
     "id": "10db4c37b8d5d559",
@@ -180,14 +180,16 @@
       "bases:Create new base": false
     }
   },
-  "active": "9533e445edf37e8f",
+  "active": "0a5e2fa296d1f7a4",
   "lastOpenFiles": [
     "2. Modules/Inventory.md",
     "2. Modules/Database details.md",
+    "2. Modules/**Quick explain**.md",
+    "4. Web tools/Pytest documentation.md",
     "2. Modules/Database structure.md",
+    "1. Daily/3 Models creation.md",
     "1. Daily/2 SQL DESIGN.md",
     "3. Bugs/Bugs details.md",
-    "4. Web tools/Pytest documentation.md",
     "2. Modules/Reporting.md",
     "1. Daily/1 Set up environment day.md",
     "Untitled.base",
@@ -196,7 +198,6 @@
     "4. Web tools/SQLite3 documentation.md",
     "4. Web tools/Structuring your project.md",
     "3332-03-31.md",
-    "2. Modules/**Quick explain**.md",
     "2. Modules/POS.md",
     "Modules/Untitled.canvas",
     "Modules/Untitled.base",

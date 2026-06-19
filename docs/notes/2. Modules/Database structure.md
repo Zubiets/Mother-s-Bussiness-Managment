@@ -3,7 +3,7 @@
 - name: Supplier's business name
 - contact_info: Phone number or email to reach them
 
-## product_categories
+## categories
 - id
 - name: Category name (e.g. makeup, candy, gifts)
 - supplier_id: Who supplies this category → suppliers
@@ -50,14 +50,9 @@
 ## expenses
 - id
 - name: Short description of the expense
-- type_id: Category of expense → expense_types
+- category_id: Category of expense → Category
 - amount: How much was spent
 - date: When the expense occurred
-
-## expense_types
-- id
-- name: Type name (e.g. supplies, utilities, rent)
-- description: Optional details about this expense type
 
 ## Relationships
 - suppliers → product_categories: one supplier can have many categories
@@ -65,4 +60,4 @@
 - products → sale_details: one product can appear in many sale details
 - sales → sale_details: one sale can have many products
 - employees → time_working: one employee can have many work day records
-- expense_types → expenses: one type can have many expenses
+- expense_types → category
