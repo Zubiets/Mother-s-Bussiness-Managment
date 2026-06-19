@@ -39,6 +39,10 @@ class Database:
         columns_str = ", ".join([f"{col} {dtype}" for col, dtype in columns.items()])
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_str})"
         self.execute_query(query)
+     
+    def select_all(self, table_name):
+        query = f"SELECT * FROM {table_name}"
+        return self.execute_query(query)
         
     def insert_item(self, table_name, item_data):
         columns = ", ".join(item_data.keys())
@@ -108,14 +112,17 @@ def create_tables():
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'salary': 'REAL NOT NULL',
-        'phone': 'TEXT'
+        'contact_info': 'TEXT NOT NULL'
     })
 
     inventory.create_table('time_working', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'employee_id': 'INTEGER NOT NULL',
+        'employee_name': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
-        'hours_worked': 'REAL NOT NULL',
+        'time_in': 'TIME NOT NULL',
+        'time_out': 'TIME NOT NULL',
+        'day_payment': 'REAL NOT NULL',
+        'extra': 'REAL NOT NULL DEFAULT 0',
         'FOREIGN KEY(employee_id)': 'REFERENCES employees(id)'
     })
 
@@ -128,6 +135,13 @@ def create_tables():
         'time': 'TIME NOT NULL',
         'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
     })
+
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_supplier_name ON suppliers(name)")
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_category_name ON categories(name)")
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_employee_name ON employees(name)")
+    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
 
 
 

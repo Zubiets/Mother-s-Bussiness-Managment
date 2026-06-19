@@ -6,3 +6,4 @@ reportlab
 qrcode[pil]
 pyinstaller
 pytest
+werkzeug
