@@ -39,11 +39,7 @@ class Database:
         columns_str = ", ".join([f"{col} {dtype}" for col, dtype in columns.items()])
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_str})"
         self.execute_query(query)
-     
-    def select_all(self, table_name):
-        query = f"SELECT * FROM {table_name}"
-        return self.execute_query(query)
-        
+    
     def insert_item(self, table_name, item_data):
         columns = ", ".join(item_data.keys())
         placeholders = ", ".join(["?" for _ in item_data])
@@ -53,7 +49,15 @@ class Database:
     def update_item(self, table_name, item_id, update_data):
         set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
-        self.execute_query(query, tuple(update_data.values()) + (item_id,))
+        self.execute_query(query, tuple(update_data.values())[1:-1] + (item_id,))
+     
+    def fetch_all(self, table_name):
+        query = f"SELECT * FROM {table_name}"
+        return self.execute_query(query)
+
+    def fetch_one(self, table_name, item):
+        return self.execute_query(f"SELECT {item} FROM {table_name}")
+        
 
 # Create an instance of the Database class and connect to the database
 inventory = Database('data/inventory.db')
@@ -80,7 +84,8 @@ def create_tables():
         'category_id': 'INTEGER NOT NULL',
         'name': 'TEXT NOT NULL',
         'price': 'REAL NOT NULL',
-        'qr_code': 'TEXT NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
+        'qr_code': 'TEXT',
         'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
     })
 
@@ -117,11 +122,11 @@ def create_tables():
 
     inventory.create_table('time_working', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'employee_name': 'INTEGER NOT NULL',
+        'employee_id': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
         'time_in': 'TIME NOT NULL',
         'time_out': 'TIME NOT NULL',
-        'day_payment': 'REAL NOT NULL',
+        'payment': 'REAL NOT NULL',
         'extra': 'REAL NOT NULL DEFAULT 0',
         'FOREIGN KEY(employee_id)': 'REFERENCES employees(id)'
     })
@@ -136,13 +141,30 @@ def create_tables():
         'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
     })
 
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_supplier_name ON suppliers(name)")
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_category_name ON categories(name)")
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_employee_name ON employees(name)")
-    inventory.execute_query("UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
+    inventory.create_table('loans', {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'supplier_id': 'INTEGER NOT NULL',
+        'amount': 'INTEGER NOT NULL',
+        'loan_date': 'DATE NOT NULL',
+        'installments': 'INTEGER NOT NULL',
+        'FOREIGN KEY(supplier_id)': 'REFERENCES supplier(id)'
+    })
 
+    inventory.create_table('installments_dates', {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'loan_id': 'INTEGER NOT NULL',
+        'number': 'INTEGER NOT NULL',
+        'date': 'DATE NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'UNPAID'",
+        'FOREIGN KEY(loan_id)': 'REFERENCES loans(id)'
+    })
+
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_code ON products(qr_code)")
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_category_name ON categories(name)")
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_supplier_name ON suppliers(name)")
+    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_employee_name ON employees(name)")
 
 
 

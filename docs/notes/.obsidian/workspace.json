@@ -13,15 +13,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2. Modules/Database structure.md",
+                "file": "2. Modules/Inventory.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Database structure"
+              "title": "Inventory"
+            }
+          },
+          {
+            "id": "71f59e54ea31e472",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "2. Modules/Inventory.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Inventory"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -180,19 +195,26 @@
       "bases:Create new base": false
     }
   },
-  "active": "0a5e2fa296d1f7a4",
+  "active": "71f59e54ea31e472",
   "lastOpenFiles": [
+    "2. Modules/database/Database details.md",
     "2. Modules/Inventory.md",
-    "2. Modules/Database details.md",
-    "2. Modules/**Quick explain**.md",
-    "4. Web tools/Pytest documentation.md",
-    "2. Modules/Database structure.md",
+    "'Words.md",
     "1. Daily/3 Models creation.md",
+    "2. Modules/database/Database structure.md",
+    "2. Modules/database/erd_database_schema.html",
+    "2. Modules/erd_database_schema.html",
+    "erd_database_schema.html",
+    "2. Modules/**Quick explain**.md",
     "1. Daily/2 SQL DESIGN.md",
+    "2. Modules/database/SCHEMA.md",
+    "2. Modules/database/schema.canvas",
+    "2. Modules/database",
+    "Untitled.base",
+    "4. Web tools/Pytest documentation.md",
     "3. Bugs/Bugs details.md",
     "2. Modules/Reporting.md",
     "1. Daily/1 Set up environment day.md",
-    "Untitled.base",
     "1. Daily/1.5 pass days.md",
     "4. Web tools/Python official documentation.md",
     "4. Web tools/SQLite3 documentation.md",
@@ -204,13 +226,10 @@
     "Base-de-datos.md",
     "README.md",
     "Pasted image 20260613031848.png",
-    "Untitled.md",
     "4. Web tools",
     "Week_1/Untitled.base",
     "3. Bugs",
     "2. Modules",
-    "1. Daily",
-    "Week_1",
     "Welcome.md",
     "create a link.md"
   ]

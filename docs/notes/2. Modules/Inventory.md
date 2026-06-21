@@ -1,17 +1,17 @@
 ## What does make?
-Descripción en 2-3 líneas de qué resuelve.
+This module will manage and represent with classes all the SQL information
 
 ## Files
 - `ui/inventory_view.py`
 - `database/models.py`
 
 ## Technical decisions
-- Usé CTkScrollableFrame porque la lista de productos puede ser larga
-- La búsqueda filtra en tiempo real con el evento KeyRelease
+- All the queries will only exist in this module files for the sake of the project consistent
+- 
 
 ## To do
-- [ ] Agregar paginación si hay más de 100 productos
-- [ ] Validar que el precio no sea negativo
+- [ ] make a responsive for the error in the database that cannot be catch in the code
+- [ ] 
 
 ## Links
 [[Database details]] [[POS]]
