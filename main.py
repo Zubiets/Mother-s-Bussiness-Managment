@@ -1,14 +1,16 @@
 from src.database import models, database
 
 
+inventory = database.Database("data/inventory.db")
+database.predet_connection(inventory)
+models.db = inventory
+
 def main():
     print("Welcome to the Inventory Management System!")
-    print(models.Supplier.search_by_parameter("name", "Felipe Zubieta"))
-    inversor = models.Supplier(*tuple(models.Supplier.search_by_parameter("name", "Felipe Zubieta")))
-    categoria = models.Category(*tuple(models.Supplier.search_by_parameter("name", "mundial")))
-    producto = models.Product
-    database.inventory.disconnect() # Disconnect from the database when the application is closed
-    print("Goodbye!") 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        inventory.disconnect() # Disconnect from the database although will be errors
+        print("Goodbye!") 

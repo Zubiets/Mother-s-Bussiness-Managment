@@ -49,7 +49,7 @@ class Database:
     def update_item(self, table_name, item_id, update_data):
         set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
-        self.execute_query(query, tuple(update_data.values())[1:-1] + (item_id,))
+        self.execute_query(query, tuple(update_data.values()) + (item_id,))
      
     def fetch_all(self, table_name):
         query = f"SELECT * FROM {table_name}"
@@ -59,45 +59,41 @@ class Database:
         return self.execute_query(f"SELECT {item} FROM {table_name}")
         
 
-# Create an instance of the Database class and connect to the database
-inventory = Database('data/inventory.db')
-inventory.connect()
 
 # create the tables using the database model
-def create_tables():
-    inventory.create_table('categories', {  # different important parts from the local
+def create_tables(db):
+    db.create_table('categories', {  # different important parts from the local
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
-        'supplier_id': 'INTEGER NOT NULL',
+        'suppliers_id': 'INTEGER NOT NULL',
         'description': 'TEXT',
-        'FOREIGN KEY(supplier_id)': 'REFERENCES suppliers(id)'
+        'FOREIGN KEY(suppliers_id)': 'REFERENCES suppliers(id)'
     })
 
-    inventory.create_table('suppliers', {
+    db.create_table('suppliers', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'contact_info': 'TEXT NOT NULL'
     })
 
-    inventory.create_table('products', {
+    db.create_table('products', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'category_id': 'INTEGER NOT NULL',
         'name': 'TEXT NOT NULL',
+        'categories_id': 'INTEGER NOT NULL',
         'price': 'REAL NOT NULL',
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'qr_code': 'TEXT',
-        'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
+        'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
     })
 
-    inventory.create_table('sales', {
+    db.create_table('sales', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'discount': 'REAL NOT NULL DEFAULT 0',
+        'datetime': 'DATE NOT NULL',
         'total_price': 'REAL NOT NULL',
-        'date': 'DATE NOT NULL',
-        'time': 'TIME NOT NULL'
+        'discount': 'REAL NOT NULL DEFAULT 0'
     })
 
-    inventory.create_table('sale_details', {
+    db.create_table('sale_details', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'sale_id': 'INTEGER NOT NULL',
         'product_id': 'INTEGER NOT NULL',
@@ -107,20 +103,20 @@ def create_tables():
         'FOREIGN KEY(product_id)': 'REFERENCES products(id)'
     })
 
-    inventory.create_table('users', {
+    db.create_table('users', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'username': 'TEXT NOT NULL',
         'password': 'TEXT NOT NULL'
     })
 
-    inventory.create_table('employees', {
+    db.create_table('employees', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'salary': 'REAL NOT NULL',
         'contact_info': 'TEXT NOT NULL'
     })
 
-    inventory.create_table('time_working', {
+    db.create_table('time_working', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'employee_id': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
@@ -131,26 +127,26 @@ def create_tables():
         'FOREIGN KEY(employee_id)': 'REFERENCES employees(id)'
     })
 
-    inventory.create_table('expenses', {
+    db.create_table('expenses', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
-        'category_id': 'INTEGER NOT NULL',
+        'categories_id': 'INTEGER NOT NULL',
         'amount': 'REAL NOT NULL',
         'date': 'DATE NOT NULL',
         'time': 'TIME NOT NULL',
-        'FOREIGN KEY(category_id)': 'REFERENCES categories(id)'
+        'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
     })
 
-    inventory.create_table('loans', {
+    db.create_table('loans', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'supplier_id': 'INTEGER NOT NULL',
+        'suppliers_id': 'INTEGER NOT NULL',
         'amount': 'INTEGER NOT NULL',
         'loan_date': 'DATE NOT NULL',
         'installments': 'INTEGER NOT NULL',
-        'FOREIGN KEY(supplier_id)': 'REFERENCES supplier(id)'
+        'FOREIGN KEY(suppliers_id)': 'REFERENCES supplier(id)'
     })
 
-    inventory.create_table('installments_dates', {
+    db.create_table('installments_dates', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'loan_id': 'INTEGER NOT NULL',
         'number': 'INTEGER NOT NULL',
@@ -159,13 +155,16 @@ def create_tables():
         'FOREIGN KEY(loan_id)': 'REFERENCES loans(id)'
     })
 
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_code ON products(qr_code)")
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_category_name ON categories(name)")
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_supplier_name ON suppliers(name)")
-    inventory.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_employee_name ON employees(name)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_code ON products(qr_code)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_category_name ON categories(name)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_supplier_name ON suppliers(name)")
+    db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_employee_name ON employees(name)")
 
-
+# App's predetermine database connection and tables creation
+def predet_connection(db: Database):
+    db.connect()
+    create_tables(db)
 
 
