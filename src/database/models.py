@@ -1,5 +1,7 @@
 from . import database
 from werkzeug.security import check_password_hash, generate_password_hash
+import datetime
+import dateutil
 
 
 db: database.Database = None
@@ -12,9 +14,9 @@ class Crud:
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
         result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
-        if result:
-            return result[0]
-        return None
+        if len(result) == 1:
+            return cls(*result[0])
+        return result
     
     def add(self):
         db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
@@ -39,7 +41,7 @@ class Crud_two_tables:
                                                 JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
                                                 WHERE {cls.MAIN_TABLE}.{parameter} = ?""", (value, ))
         if result:
-            return result[0]
+            return cls(*result[0])
         return None
 
     def add(self):
@@ -54,84 +56,109 @@ class Crud_two_tables:
 class Product(Crud_two_tables):
     MAIN_TABLE = 'products'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id, price: int, state = "ACTIVE", qr_code = None, category = ""):
+    def __init__(self, id: int, name: str, category_id: int, price: int, amount: int = 1, state = "ACTIVE", qr_code = None, category = ""):
         super()._init_(id)
         self.name = name
         self.categories_id = category_id
         self.price = price
+        self.amount = amount
         self.state = state
         self.qr_code = qr_code
         self.category = category
+        if amount == 0:
+            self.state = "INACTIVE"
     
 class Category(Crud_two_tables):
     MAIN_TABLE = 'categories'
     SECONDARY_TABLE = 'suppliers'
-    def __init__(self, id: int, name: str, supplier_id, description = "", supplier = ""):
+    def __init__(self, id: int, name: str, supplier_id: int, state: str = "ACTIVE", description = "", supplier = ""):
         super()._init_(id)
         self.name = name 
         self.suppliers_id = supplier_id
+        self.state = state
         self.description = description
         self.supplier = supplier
 
 class Supplier(Crud):
     MAIN_TABLE = "suppliers"
-    def __init__(self, id: int, name, contact_info):
+    def __init__(self, id: int, name, contact_info, state = "ACTIVE"):
         super()._init_(id)
         self.name = name
         self.contact_info = contact_info
-
+        self.state = state
 class Sale(Crud):
     MAIN_TABLE = "sales"
-    def __init__(self, id: int, datetime, total_price = 0, discount = 0.0):
+    def __init__(self, id: int, datetime, total_price = 0.0, discount = 0):
         super()._init_(id)
         self.datetime = datetime
         self.total_price = total_price
         self.discount = discount
 
-    def add_sale(self):
-        db.execute_query("INSERT INTO sales (total_price, datetime, discount) VALUES (?, ?, ?, ?)", 
-                                        (self.total_price, self.datetime, self.discount))
+    
 
-    def add_sale_detail(self, id: int, product, quantity, price):
-        product_id = Product.search_by_name((product)[0][0])[0]
-        db.execute_query("INSERT INTO sale_details (sale_id, product_id, quantity, price) VALUES (?, ?, ?, ?)", 
-                                        (self.id, product_id, quantity, price))
+    def add_sale_detail(self, product_id: int, quantity: int, price: int):
+        db.execute_query("INSERT INTO sale_details (sale_id, product_id, quantity) VALUES (?, ?, ?)", 
+                                        (self.id, product_id, quantity))
         self.total_price += price * quantity
-    
-    def calculate_total_price(self):
-        self.total_price = self.total_price * (1 - self.discount/100)
-        db.execute_query("UPDATE sales SET total_price = ? WHERE date = ? AND time = ?", 
-                                        (self.total_price, self.datetime))
-    
-    def delete_sale(self):
-        db.execute_query("DELETE FROM sale_details WHERE sale_id = ?", (self.id,))
-        db.execute_query("DELETE FROM sales WHERE id = ?", (self.id,))
 
-    def get_sales_details(self):
-        return db.execute_query("""SELECT product.name, quantity, price FROM sale_details
+    def get_sale_details(self):
+        return db.execute_query("""SELECT products.name, quantity, products.price FROM sale_details
                                                 JOIN products ON sale_details.product_id = products.id
                                                 WHERE sale_id = ?""", (self.id,))
+    
+    def close_sale(self):
+        self.total_price = self.total_price * self.discount
 
 class Employee(Crud):
     MAIN_TABLE = 'employees'
-    def __init__(self, id: int, name: str, salary: int, contact: str):
+    def __init__(self, id: int, name: str, salary: int, contact: str, state = "ACTIVE"):
         super()._init_(id)
         self.name = name
         self.salary = salary
         self.contact_info = contact
+        self.state = state
+        self.add()
 
-    def registrer_enter_time(self, date, time_in):
-        db.execute_query("INSERT INTO time_working (employee_id, employee_name, date, time_in) VALUES (?, ?, ?)", 
-                                        (self.id, self.name, date, time_in))
+class Work_day(Crud_two_tables):
+    MAIN_TABLE = "time_worked"
+    SECONDARY_TABLE = "employees"
+    second_parameter = "salary"
 
-    def registrer_exit_time(self, date, time_out, extra = 0.0):
-        db.execute_query("UPDATE time_working SET time_out = ?, payment = ?, extra = ? WHERE employee_name = ? AND date = ?", 
-                                        (time_out, self.name, date, extra))
+    def __init__(self, id, employee_id, date, time_in, 
+                 time_out = "00-00-00 00:00:00", payment = 0,state = "UNPAID", extra = 0, employee_salary = 0):
+        self.id = id
+        self.employee_id = employee_id
+        self.date = date
+        self.time_in = time_in
+        self.time_out = time_out
+        self.payment = payment
+        self.state = state
+        self.extra = extra
+        self.employee_salary = employee_salary
+        self.add()
+
+    @staticmethod
+    def search_by_parameter(employee_id, date):
+        result = db.execute_query(f"""SELECT {Work_day.MAIN_TABLE}.*, {Work_day.SECONDARY_TABLE}.{Work_day.second_parameter}
+                                            FROM {Work_day.MAIN_TABLE}
+                                            JOIN {Work_day.SECONDARY_TABLE} ON {Work_day.MAIN_TABLE}.employee_id = {Work_day.SECONDARY_TABLE}.id
+                                            WHERE {Work_day.MAIN_TABLE}.employee_id = ? AND {Work_day.MAIN_TABLE}.date = ?""", employee_id, date)
+        if len(result) == 1:
+            return Work_day(*result[0])
+        return result
+    
+    def day_over(self, extra, salary, time_out):
+        self.time_out = time_out
+        self.extra = extra
+        self.salary = salary
+        self.time_in = datetime.datetime.strptime(self.time_in, "%Y-%m-%d %H:%M:%S.%f")
+        self.time_out = datetime.datetime.strptime(self.time_out, "%Y-%m-%d %H:%M:%S.%f")
+        self.payment = (self.employee_salary * ((self.time_out - self.time_in).total_seconds()/3600)) + self.extra
 
 class Expense(Crud_two_tables):
     MAIN_TABLE = 'expenses'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: int, category_id, amount: int, datetime, category: str):
+    def __init__(self, id: int, name: str, category_id, amount: float, datetime, category: str = ""):
         super()._init_(id)
         self.name = name
         self.categories_id = category_id
@@ -142,16 +169,31 @@ class Expense(Crud_two_tables):
 class Loan(Crud_two_tables):
     MAIN_TABLE = 'loans'
     SECONDARY_TABLE = 'suppliers'
-    def __init__(self, id: int, supplier_id, amount: int, loan_date: str, installments: int, supplier = ''):
+    def __init__(self, id: int, supplier_id, amount: float, loan_date: str, installments: int, state = "ACTIVE", supplier = ''):
         super()._init_(id)
         self.suppliers_id = supplier_id
         self.amount = amount
         self.loan_date = loan_date
         self.installments = installments
+        self.state = state
         self.supplier = supplier
 
-    def determine_payments_dates(self, id: int, time_intervals: str):
-        pass
+    def determine_payments_dates(self, time_intervals: str):
+        loan_date = datetime.datetime.strptime(self.loan_date, "%Y-%m-%d")
+        for i in range(self.installments):
+            if time_intervals == "WEEKLY":
+                payment_date = loan_date + datetime.timedelta(weeks=i)
+            elif time_intervals == "BIWEEKLY":
+                payment_date = loan_date + datetime.timedelta(weeks=2*i)
+            elif time_intervals == "MONTHLY":
+                payment_date = dateutil.relativedelta.relativedelta(months=i)
+                payment_date = loan_date + payment_date
+            db.execute_query("INSERT INTO installments_details (loan_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y-%m-%d")))
+
+    def update_installment_state(self, id, state):
+        db.execute_query("UPDATE installments_details SET state = ? WHERE id = ?", (state, id))
+
+
 class User:
     def __init__(self, username: str, password: str):
         self.username = username

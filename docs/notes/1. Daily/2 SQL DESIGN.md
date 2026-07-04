@@ -19,7 +19,7 @@ Have ready the code for the creation of a SQL table, and make some tests
 
 - [x] create tests and make sure all works
 
-- The [[Database structure]] will use the library SQLite3. See the [[SQLite3 documentation]] for more information
+- The [[Database structure]] will use the library SQLite3. See the [[SQLite3]] for more information
 
   
 ## 🧱 Headaches
@@ -36,8 +36,8 @@ Solution: Delete all information inside the test table.
 - Create a simple connection using OOP and SQLite3.
 - Declarate variables with : for be more descriptive with the type of the variables. Ex: x: int = 25.
 - I learned a key concept of python, that is the tuples, that is the way that python save variables of different types in something like the queries, also the results of that queries are not a list, are tuples. Ex: (1, 2, 3) -- 1, a -- 5, -- (). 
-- for more information about the last two point see [[Python official documentation]].
-- how to make test files using pytest library, [[Pytest documentation]], take on count something like a decorator to erase all the changes made by the test (TO DO).
+- for more information about the last two point see [[*Python official documentation*]].
+- how to make test files using pytest library, [[Pytest]], take on count something like a decorator to erase all the changes made by the test (TO DO).
 
 ## ➡️ Tomorrow
 

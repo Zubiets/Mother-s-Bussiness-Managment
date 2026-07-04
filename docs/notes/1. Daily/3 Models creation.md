@@ -2,73 +2,41 @@
 date: 2026-06-17
 week: 1
 day: 3
-date 2: 06/18/2026
+until date: 06/27/2026
 ---
-
-  
-
 ## 🎯 Day goal
 
-Create classes that will be use like models for the tables and the functions for manage them
+- Create classes that will be use like models for the tables
+- Add methods to manage it
+- Have ready the tests.
 
-  
 
 ## ✅ I did
 
-  
+- [x] Create the models with OOP, defining the attributes and methods.
+- [x] Have already all the CRUD in the classes
+- [ ] create instances, manage the SQL and verify all works
+- [ ] Over the function to calculate Installments (Ask to my mother for the preferences)
 
-- [x] planning the schema of the tables and read the SQLite3 documentation
-
-  
-
-- [x] make the code that will create the tables
-
-  
-
-- [x] create tests and make sure all works
-
-  
-
-- The [[Database structure]] will use the library SQLite3. See the [[SQLite3 documentation]] for more information
-
-  
 
 ## 🧱 Headaches
 
-  
-
-- Problem with the imports
-
-Solution: There are two parts of this problem. In the main module to execute the package you need to import at least one of the functions. The second part is for access to a file or folder in the project, you need to import or put the path like the file were in the root directory, except for the files in the same folder-package.
+- Use tests without edit the database
+Solution: Use pytest fixture and create a fiction db that will use the predetermine database in models.
 
 - The pytest had been having problems
-
 Solution: use it with the command python -m to be allocated in the root directory.
 
 - The first test put new information in the database that makes failed the other tests
-
 Solution: Delete all information inside the test table.
 
+- Classes seemed in their some of their methods.
+Solution: use inheritance
   
 
 ## 💡 learned
 
-  
-
-- Create a simple connection using OOP and SQLite3.
-
-- Declarate variables with : for be more descriptive with the type of the variables. Ex: x: int = 25.
-
-- I learned a key concept of python, that is the tuples, that is the way that python save variables of different types in something like the queries, also the results of that queries are not a list, are tuples. Ex: (1, 2, 3) -- 1, a -- 5, -- ().
-
-- for more information about the last two point see [[Python official documentation]].
-
-- how to make test files using pytest library, [[Pytest documentation]], take on count something like a decorator to erase all the changes made by the test (TO DO).
-
-  
-
+- A LOT.
 ## ➡️ Tomorrow
 
-  
-
-Create and have ready the models and the function for data manage
+Begin with the UI, (Using web tools), don't forget solve the problems find in test

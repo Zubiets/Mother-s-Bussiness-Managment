@@ -2,7 +2,7 @@ import sqlite3
 
 # model to manipulate easier the database 
 class Database:
-    def __init__(self, db_path):
+    def __init__(self, db_path: str):
         self.db_path = db_path
         self.connection = None
 
@@ -12,13 +12,14 @@ class Database:
             print(f"Connected to database: {self.db_path}")
         except sqlite3.Error as e:
             print(f"Error connecting to database: {e}")
+            return False
 
     def disconnect(self):
         if self.connection:
             self.connection.close()
             print("Disconnected from database")
 
-    def execute_query(self, query, params=None):
+    def execute_query(self, query, params: tuple = None):
         if not self.connection:
             print("No database connection")
             return None
@@ -33,30 +34,32 @@ class Database:
             return cursor.fetchall()
         except sqlite3.Error as e:
             print(f"Error executing query: {e}")
-            return None
+            return False
         
-    def create_table(self, table_name, columns):
+    def create_table(self, table_name, columns: dict):
         columns_str = ", ".join([f"{col} {dtype}" for col, dtype in columns.items()])
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_str})"
         self.execute_query(query)
     
-    def insert_item(self, table_name, item_data):
+    def insert_item(self, table_name, item_data: dict):
         columns = ", ".join(item_data.keys())
         placeholders = ", ".join(["?" for _ in item_data])
         query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
         self.execute_query(query, tuple(item_data.values()))
     
-    def update_item(self, table_name, item_id, update_data):
+    def update_item(self, table_name, item_id, update_data: dict):
         set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
      
-    def fetch_all(self, table_name):
+    def fetch_table(self, table_name):
         query = f"SELECT * FROM {table_name}"
         return self.execute_query(query)
 
-    def fetch_one(self, table_name, item):
-        return self.execute_query(f"SELECT {item} FROM {table_name}")
+    def fetch_by_id(self, table_name: str, id = int, second_table: str = None):
+        if second_table:
+            return self.execute_query(f"SELECT * FROM {table_name} WHERE {second_table}_id = {id}")
+        return self.execute_query(f"SELECT * FROM {table_name} WHERE id = {id}")
         
 
 
@@ -66,6 +69,7 @@ def create_tables(db):
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'suppliers_id': 'INTEGER NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'description': 'TEXT',
         'FOREIGN KEY(suppliers_id)': 'REFERENCES suppliers(id)'
     })
@@ -73,7 +77,8 @@ def create_tables(db):
     db.create_table('suppliers', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
-        'contact_info': 'TEXT NOT NULL'
+        'contact_info': 'TEXT NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
     })
 
     db.create_table('products', {
@@ -81,6 +86,7 @@ def create_tables(db):
         'name': 'TEXT NOT NULL',
         'categories_id': 'INTEGER NOT NULL',
         'price': 'REAL NOT NULL',
+        "amount": "INTEGER NOT NULL DEFAULT 1",   # if the product is active, there's at least one sample
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'qr_code': 'TEXT',
         'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
@@ -98,7 +104,6 @@ def create_tables(db):
         'sale_id': 'INTEGER NOT NULL',
         'product_id': 'INTEGER NOT NULL',
         'quantity': 'INTEGER NOT NULL',
-        'price': 'REAL NOT NULL',
         'FOREIGN KEY(sale_id)': 'REFERENCES sales(id)',
         'FOREIGN KEY(product_id)': 'REFERENCES products(id)'
     })
@@ -113,16 +118,18 @@ def create_tables(db):
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'name': 'TEXT NOT NULL',
         'salary': 'REAL NOT NULL',
-        'contact_info': 'TEXT NOT NULL'
+        'contact_info': 'TEXT NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
     })
 
-    db.create_table('time_working', {
+    db.create_table('time_worked', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'employee_id': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
-        'time_in': 'TIME NOT NULL',
-        'time_out': 'TIME NOT NULL',
-        'payment': 'REAL NOT NULL',
+        'time_in': 'DATE NOT NULL',
+        'time_out': "DATE NOT NULL",
+        'payment': 'REAL NOT NULL DEFAULT 0',
+        'state': "TEXT NOT NULL DEFAULT 'UNPAID'",
         'extra': 'REAL NOT NULL DEFAULT 0',
         'FOREIGN KEY(employee_id)': 'REFERENCES employees(id)'
     })
@@ -132,21 +139,21 @@ def create_tables(db):
         'name': 'TEXT NOT NULL',
         'categories_id': 'INTEGER NOT NULL',
         'amount': 'REAL NOT NULL',
-        'date': 'DATE NOT NULL',
-        'time': 'TIME NOT NULL',
+        'datetime': 'DATE NOT NULL',
         'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
     })
 
     db.create_table('loans', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'suppliers_id': 'INTEGER NOT NULL',
-        'amount': 'INTEGER NOT NULL',
+        'amount': 'REAL NOT NULL',
         'loan_date': 'DATE NOT NULL',
         'installments': 'INTEGER NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'FOREIGN KEY(suppliers_id)': 'REFERENCES supplier(id)'
     })
 
-    db.create_table('installments_dates', {
+    db.create_table('installments_details', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'loan_id': 'INTEGER NOT NULL',
         'number': 'INTEGER NOT NULL',
@@ -165,6 +172,8 @@ def create_tables(db):
 # App's predetermine database connection and tables creation
 def predet_connection(db: Database):
     db.connect()
+    if db == False:
+        return "Connection failed"
     create_tables(db)
 
 

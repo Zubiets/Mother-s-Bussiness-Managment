@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2. Modules/Inventory.md",
+                "file": "2. Modules/database/Database structure.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Inventory"
+              "title": "Database structure"
             }
           }
         ],
@@ -198,29 +198,33 @@
   "active": "71f59e54ea31e472",
   "lastOpenFiles": [
     "2. Modules/database/Database details.md",
-    "2. Modules/Inventory.md",
-    "'Words.md",
     "1. Daily/3 Models creation.md",
+    "1. Daily/2 SQL DESIGN.md",
+    "3. Bugs/Bugs details.md",
+    "2. Modules/Test.md",
+    "2. Modules/Reporting.md",
+    "2. Modules/Inventory.md",
+    "2. Modules/POS.md",
+    "4. Web tools/Python libraries/Pytest.md",
     "2. Modules/database/Database structure.md",
+    "2. Modules/**Quick explain**.md",
+    "4. Web tools/Structuring your project.md",
+    "4. Web tools/Python libraries/*Python official documentation*.md",
+    "4. Web tools/Python libraries/dateutil.md",
+    "4. Web tools/Python libraries/datetime.md",
+    "4. Web tools/Python libraries",
+    "'Words.md",
     "2. Modules/database/erd_database_schema.html",
     "2. Modules/erd_database_schema.html",
     "erd_database_schema.html",
-    "2. Modules/**Quick explain**.md",
-    "1. Daily/2 SQL DESIGN.md",
     "2. Modules/database/SCHEMA.md",
     "2. Modules/database/schema.canvas",
     "2. Modules/database",
     "Untitled.base",
-    "4. Web tools/Pytest documentation.md",
-    "3. Bugs/Bugs details.md",
-    "2. Modules/Reporting.md",
     "1. Daily/1 Set up environment day.md",
     "1. Daily/1.5 pass days.md",
-    "4. Web tools/Python official documentation.md",
-    "4. Web tools/SQLite3 documentation.md",
-    "4. Web tools/Structuring your project.md",
+    "4. Web tools/Python libraries/SQLite3.md",
     "3332-03-31.md",
-    "2. Modules/POS.md",
     "Modules/Untitled.canvas",
     "Modules/Untitled.base",
     "Base-de-datos.md",
@@ -229,7 +233,6 @@
     "4. Web tools",
     "Week_1/Untitled.base",
     "3. Bugs",
-    "2. Modules",
     "Welcome.md",
     "create a link.md"
   ]
