@@ -5,8 +5,8 @@ import dateutil
 
 
 db: database.Database = None
-class Crud:
-    MAIN_TABLE = None
+class Crud:   # Create(in database module), Read, Update and Delete
+    MAIN_TABLE: str = None # table name
 
     def _init_(self, id: int):
         self.id = id
@@ -15,40 +15,47 @@ class Crud:
     def search_by_parameter(cls, parameter: str, value):
         result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
         if len(result) == 1:
-            return cls(*result[0])
-        return result
+            return cls(*result[0])  # unpack the tuple of the row elements
+        return result # if not a single row might be for a different result hoped
     
+    # only use for UI create functionalities
     def add(self):
+        "To verify don't repeat values, this function will return a False in case of unique contrait"
         return db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
 
-
+    # delete a row from the table, only be used with tables no needed for other tables
     def delete(self):
         db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id = ?", (self.id,))
 
+    # default class to put the class information into the table
     def update(self):
         db.update_item(f'{self.MAIN_TABLE}', self.id, dict(list(vars(self).items())[1:]))
 
 class Crud_two_tables:
     MAIN_TABLE = None
-    SECONDARY_TABLE = None
+    SECONDARY_TABLE = None # the name of the another tables needed
 
     def _init_(self, id: int):
-        self.id = id
+        self.id = id # important to the delete function works
 
     @classmethod
-    def search_by_parameter(cls, parameter: str, value):
+    def search_by_parameter(cls, parameter: str, value): # flexible function to read a get query
         result = db.execute_query(f"""SELECT {cls.MAIN_TABLE}.*, {cls.SECONDARY_TABLE}.name
                                                 FROM {cls.MAIN_TABLE}
                                                 JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
                                                 WHERE {cls.MAIN_TABLE}.{parameter} = ?""", (value, ))
-        if result:
-            return cls(*result[0])
-        return None
+        if len(result) == 1:
+            return cls(*result[0])  # unpack the tuple of the row elements
+        return result # if not a single row might be for a different result hoped
 
     def add(self):
-        db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:-1]))
+        return db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:-1]))
     
     def delete(self):
+        """
+        Don't be used in classes where are other tables that depends on their tables
+        replace with a statement atributte 
+        """
         db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id = ?", (self.id,) )
         
     def update(self):
@@ -57,14 +64,14 @@ class Crud_two_tables:
 class Product(Crud_two_tables):
     MAIN_TABLE = 'products'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id: int, price: int, amount: int = 1, state = "ACTIVE", qr_code = None, category = ""):
+    def __init__(self, id: int, name: str, category_id: int, price: int, amount: int = 1, state = "ACTIVE", qr_code: str = "", category = ""):
         super()._init_(id)
         self.name = name
         self.categories_id = category_id
         self.price = price
         self.amount = amount
         self.state = state
-        self.qr_code = qr_code
+        self.qr_code = qr_code  
         self.category = category
         if amount == 0:
             self.state = "INACTIVE"
@@ -95,6 +102,7 @@ class Sale(Crud):
         self.total_price = total_price
         self.discount = discount
 
+    # Could be used in another class but it'd difficult more than the necessary
     def add_sale_detail(self, product_id: int, quantity: int, price: int):
         db.execute_query("INSERT INTO sale_details (sale_id, product_id, quantity) VALUES (?, ?, ?)", 
                                         (self.id, product_id, quantity))
@@ -110,6 +118,7 @@ class Sale(Crud):
                                         (quantity, self.id, product_id))
         self.total_price += price * quantity
 
+    # apart to let the work to the UI to avoid unnecessary errors
     def close_sale(self):
         self.total_price = self.total_price * self.discount
 
@@ -140,7 +149,7 @@ class Work_day(Crud_two_tables):
         self.employee_salary = employee_salary
 
     @staticmethod
-    def search_by_parameter(employee_id, date):
+    def search_by_parameter(employee_id, date):  # override due to is needed two arguments in the search
         result = db.execute_query(f"""SELECT {Work_day.MAIN_TABLE}.*, {Work_day.SECONDARY_TABLE}.{Work_day.second_parameter}
                                             FROM {Work_day.MAIN_TABLE}
                                             JOIN {Work_day.SECONDARY_TABLE} ON {Work_day.MAIN_TABLE}.employee_id = {Work_day.SECONDARY_TABLE}.id
@@ -183,16 +192,16 @@ class Loan(Crud_two_tables):
         self.supplier = supplier
 
     def determine_payments_dates(self, time_intervals: str):
-        loan_date = datetime.datetime.strptime(self.date, "%Y-%m-%d")
+        loan_date = datetime.datetime.strptime(self.date, "%Y/%m/%d")
         for i in range(self.installments):
-            if time_intervals == "WEEKLY":
+            if time_intervals == "SEMANAL": # in spanish to make short some parts of the UI
                 payment_date = loan_date + datetime.timedelta(weeks=i)
-            elif time_intervals == "BIWEEKLY":
+            elif time_intervals == "QUINCENAL":
                 payment_date = loan_date + datetime.timedelta(weeks=2*i)
-            elif time_intervals == "MONTHLY":
-                payment_date = dateutil.relativedelta.relativedelta(months=i)
+            elif time_intervals == "MENSUAL":
+                payment_date = dateutil.relativedelta.relativedelta(months=i) # is used the timeutil to make easier the calculate
                 payment_date = loan_date + payment_date
-            db.execute_query("INSERT INTO installments_details (loans_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y-%m-%d")))
+            db.execute_query("INSERT INTO installments_details (loans_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y/%m/%d")))
 
     def update_installment_state(self, id, state):
         db.execute_query("UPDATE installments_details SET state = ? WHERE id = ?", (state, id))
@@ -203,14 +212,15 @@ class User:
         self.username = username
         self.password = password
     
-    def check_password(self):
+    def check_password(self): # use the security function check password from Werzeuk library
         return check_password_hash(
             db.execute_query("SELECT password FROM users WHERE name = ?", (self.username,))
                                             , self.password)
 
     def set_user(self):
         db.execute_query("INSERT INTO users (name, password) VALUES (?, ?)", 
-                                        (self.username, generate_password_hash(self.password)))
+                                        (self.username, generate_password_hash(self.password))) 
+                                                        # learned in cs50, save with hash for security
 
     def update_password(self):
         db.execute_query("UPDATE users SET password = ? WHERE name = ?", generate_password_hash(self.password), self.username)

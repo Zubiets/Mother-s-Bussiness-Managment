@@ -8,21 +8,17 @@ This module will be used to verify all in the application works with tools that 
 
 - `tests/test_database.py`
 
-  
 
 ## Technical decisions
 
 - Will be execute with a make command
+- for functionality (or module), will be created a new test file. For that, in the files will be made a test for every important part to verify.
 
   
-
 ## To do
 
-- [ ] Agregar paginación si hay más de 100 productos
+- [ ] Add all kind of new functionality that affect to the back end 
 
-- [ ] Validar que el precio no sea negativo
-
-  
 
 ## Links
 

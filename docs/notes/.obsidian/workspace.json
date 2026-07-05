@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2. Modules/database/Database structure.md",
+                "file": "1. Daily/3 Models creation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Database structure"
+              "title": "3 Models creation"
             }
           }
         ],
@@ -197,16 +197,16 @@
   },
   "active": "71f59e54ea31e472",
   "lastOpenFiles": [
-    "2. Modules/database/Database details.md",
-    "1. Daily/3 Models creation.md",
     "1. Daily/2 SQL DESIGN.md",
+    "1. Daily/3 Models creation.md",
     "3. Bugs/Bugs details.md",
-    "2. Modules/Test.md",
-    "2. Modules/Reporting.md",
     "2. Modules/Inventory.md",
+    "2. Modules/Test.md",
+    "2. Modules/database/Database structure.md",
+    "2. Modules/database/Database details.md",
+    "2. Modules/Reporting.md",
     "2. Modules/POS.md",
     "4. Web tools/Python libraries/Pytest.md",
-    "2. Modules/database/Database structure.md",
     "2. Modules/**Quick explain**.md",
     "4. Web tools/Structuring your project.md",
     "4. Web tools/Python libraries/*Python official documentation*.md",

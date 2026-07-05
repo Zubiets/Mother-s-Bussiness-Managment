@@ -4,12 +4,14 @@ import datetime
 
 @pytest.fixture
 def config():
-    clean_db = database.Database(":memory:")
-    print(database.predet_connection(clean_db))
-    assert clean_db.connection is not None, "Database connection should be established"
-    models.db = clean_db
-    yield clean_db
-    clean_db.disconnect()
+    try:
+        clean_db = database.Database(":memory:")
+        print(database.predet_connection(clean_db))
+        assert clean_db.connection is not None, "Database connection should be established"
+        models.db = clean_db
+        yield clean_db
+    finally:
+        clean_db.disconnect()
 
 @pytest.fixture
 def supplier(config):
@@ -165,7 +167,7 @@ def test_loans(supplier, config):
     assert result.amount == 500000, "Loan amount mismatch"
     assert result.state == "ACTIVE", "Loan state mismatch"
     assert result.installments == 3, "Loan installments mismatch"
-    result.determine_payments_dates("MONTHLY")
+    result.determine_payments_dates("MENSUALMENTE")
     installments = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
     assert installments, "Installments not found"
     for i, installment in enumerate(installments): assert int(installment[3][6]) == 6+i

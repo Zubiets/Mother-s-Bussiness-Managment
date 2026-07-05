@@ -85,7 +85,7 @@ installments it will be paid in — each installment lives in installments_detai
 Details each individual installment of a loan with its due date and
 whether it has been paid. Enables installment-by-installment tracking.
 - loan_id: loan this installment belongs to → loans
-- number: installment number (1, 2, 3...)
+- number: installment number (1, 2, 3...), important to make importance
 - date: due date for this installment
 - state: UNPAID or PAID
 
