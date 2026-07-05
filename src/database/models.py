@@ -19,7 +19,8 @@ class Crud:
         return result
     
     def add(self):
-        db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
+        return db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
+
 
     def delete(self):
         db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id = ?", (self.id,))
@@ -88,13 +89,11 @@ class Supplier(Crud):
         self.state = state
 class Sale(Crud):
     MAIN_TABLE = "sales"
-    def __init__(self, id: int, datetime, total_price = 0.0, discount = 0):
+    def __init__(self, id: int, datetime: str, total_price = 0.0, discount = 0):
         super()._init_(id)
         self.datetime = datetime
         self.total_price = total_price
         self.discount = discount
-
-    
 
     def add_sale_detail(self, product_id: int, quantity: int, price: int):
         db.execute_query("INSERT INTO sale_details (sale_id, product_id, quantity) VALUES (?, ?, ?)", 
@@ -105,7 +104,12 @@ class Sale(Crud):
         return db.execute_query("""SELECT products.name, quantity, products.price FROM sale_details
                                                 JOIN products ON sale_details.product_id = products.id
                                                 WHERE sale_id = ?""", (self.id,))
-    
+
+    def update_sale_detail(self, product_id: int, quantity: int, price: int):
+        db.execute_query("UPDATE sale_details SET quantity = ? WHERE sale_id = ? AND product_id = ?", 
+                                        (quantity, self.id, product_id))
+        self.total_price += price * quantity
+
     def close_sale(self):
         self.total_price = self.total_price * self.discount
 
@@ -117,15 +121,14 @@ class Employee(Crud):
         self.salary = salary
         self.contact_info = contact
         self.state = state
-        self.add()
 
 class Work_day(Crud_two_tables):
     MAIN_TABLE = "time_worked"
     SECONDARY_TABLE = "employees"
     second_parameter = "salary"
 
-    def __init__(self, id, employee_id, date, time_in, 
-                 time_out = "00-00-00 00:00:00", payment = 0,state = "UNPAID", extra = 0, employee_salary = 0):
+    def __init__(self, id, employee_id, date: str, time_in: str, 
+                 time_out = "00/00/00 00:00:00", payment = 0,state = "UNPAID", extra = 0, employee_salary = 0):
         self.id = id
         self.employee_id = employee_id
         self.date = date
@@ -135,30 +138,31 @@ class Work_day(Crud_two_tables):
         self.state = state
         self.extra = extra
         self.employee_salary = employee_salary
-        self.add()
 
     @staticmethod
     def search_by_parameter(employee_id, date):
         result = db.execute_query(f"""SELECT {Work_day.MAIN_TABLE}.*, {Work_day.SECONDARY_TABLE}.{Work_day.second_parameter}
                                             FROM {Work_day.MAIN_TABLE}
                                             JOIN {Work_day.SECONDARY_TABLE} ON {Work_day.MAIN_TABLE}.employee_id = {Work_day.SECONDARY_TABLE}.id
-                                            WHERE {Work_day.MAIN_TABLE}.employee_id = ? AND {Work_day.MAIN_TABLE}.date = ?""", employee_id, date)
+                                            WHERE {Work_day.MAIN_TABLE}.employee_id = ? AND {Work_day.MAIN_TABLE}.date = ?""", (employee_id, date))
         if len(result) == 1:
             return Work_day(*result[0])
+        elif len(result) > 1:
+            return [Product(*fila) for fila in result]
         return result
     
-    def day_over(self, extra, salary, time_out):
+    def day_over(self, extra, time_out: str):
         self.time_out = time_out
         self.extra = extra
-        self.salary = salary
-        self.time_in = datetime.datetime.strptime(self.time_in, "%Y-%m-%d %H:%M:%S.%f")
-        self.time_out = datetime.datetime.strptime(self.time_out, "%Y-%m-%d %H:%M:%S.%f")
-        self.payment = (self.employee_salary * ((self.time_out - self.time_in).total_seconds()/3600)) + self.extra
+        time_in = datetime.datetime.strptime(self.time_in, "%Y/%m/%d %H:%M:%S")
+        time_out = datetime.datetime.strptime(self.time_out, "%Y/%m/%d %H:%M:%S")
+        self.payment = (self.employee_salary * ((time_out - time_in).total_seconds()/3600)) + self.extra
+        self.update()
 
 class Expense(Crud_two_tables):
     MAIN_TABLE = 'expenses'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id, amount: float, datetime, category: str = ""):
+    def __init__(self, id: int, name: str, category_id, amount: float, datetime: str, category: str = ""):
         super()._init_(id)
         self.name = name
         self.categories_id = category_id
@@ -169,17 +173,17 @@ class Expense(Crud_two_tables):
 class Loan(Crud_two_tables):
     MAIN_TABLE = 'loans'
     SECONDARY_TABLE = 'suppliers'
-    def __init__(self, id: int, supplier_id, amount: float, loan_date: str, installments: int, state = "ACTIVE", supplier = ''):
+    def __init__(self, id: int, supplier_id, amount: float, date: str, installments: int, state = "ACTIVE", supplier = ''):
         super()._init_(id)
         self.suppliers_id = supplier_id
         self.amount = amount
-        self.loan_date = loan_date
+        self.date = date
         self.installments = installments
         self.state = state
         self.supplier = supplier
 
     def determine_payments_dates(self, time_intervals: str):
-        loan_date = datetime.datetime.strptime(self.loan_date, "%Y-%m-%d")
+        loan_date = datetime.datetime.strptime(self.date, "%Y-%m-%d")
         for i in range(self.installments):
             if time_intervals == "WEEKLY":
                 payment_date = loan_date + datetime.timedelta(weeks=i)
@@ -188,7 +192,7 @@ class Loan(Crud_two_tables):
             elif time_intervals == "MONTHLY":
                 payment_date = dateutil.relativedelta.relativedelta(months=i)
                 payment_date = loan_date + payment_date
-            db.execute_query("INSERT INTO installments_details (loan_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y-%m-%d")))
+            db.execute_query("INSERT INTO installments_details (loans_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y-%m-%d")))
 
     def update_installment_state(self, id, state):
         db.execute_query("UPDATE installments_details SET state = ? WHERE id = ?", (state, id))

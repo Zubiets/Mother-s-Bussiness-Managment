@@ -14,30 +14,31 @@ def config():
 @pytest.fixture
 def supplier(config):
     s = models.Supplier(id=None, name="Test Supplier", contact_info="123456789")
-    s.add()
+    assert s.add() != False, "There's a unique contrait fail"
     return models.Supplier.search_by_parameter("name", "Test Supplier")
 
 @pytest.fixture
 def category(supplier):
     c = models.Category(id=None, name="Test Category", supplier_id=supplier.id, description="Test description")
-    c.add()
+    assert c.add() != False, "There's a unique contrait fail"
     return models.Category.search_by_parameter("name", "Test Category")
 
 @pytest.fixture
 def product(category):
     p = models.Product(id=None, name="Test Product", category_id=category.id, price=5000, qr_code="TEST123")
-    p.add()
+    assert p.add() != False, "There's a unique contrait fail"
     return models.Product.search_by_parameter("name", "Test Product")
 
 @pytest.fixture
 def sale(product):
-    s = models.Sale(id=None, datetime=datetime.datetime.now(), total_price=0, discount=0)
-    s.add()
+    s = models.Sale(id=None, datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"), total_price=0, discount=0)
+    assert s.add() != False, "There's a unique contrait fail"
     return models.Sale.search_by_parameter("total_price", 0)
 
 @pytest.fixture
 def employee(config):
     e = models.Employee(id=None, name="Test Employee", salary=1500000, contact="3001234567")
+    assert e.add() != False, "There's a unique contrait fail"
     return models.Employee.search_by_parameter("name", "Test Employee")
 
 def test_suppliers(supplier):
@@ -115,23 +116,18 @@ def test_employees(employee):
 
 def test_work_day(employee):
     work = models.Work_day(
-        id=None,
-        employee_id=employee.id,
-        date="2026-06-20",
-        time_in=str(datetime.datetime.now())
+        None,
+        employee.id,
+        datetime.datetime.now().strftime("%Y/%m/%d"),
+        datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     )
-    result = models.Work_day.search_by_parameter(employee.id, "2026-06-20")
-    assert result, "Work day not found after add"
-    work = models.Work_day(*result[0]) if isinstance(result, list) else result
-    assert work.employee_id == employee.id, "Work day employee mismatch"
-    work.day_over(
-        extra=0,
-        salary=employee.salary,
-        time_out=str(datetime.datetime.now())
-    )
-    work.update()
-    updated = models.Work_day.search_by_parameter(employee.id, "2026-06-20")
-    assert updated.payment > 0, "Work day payment not calculated"
+    work.add()
+    work = models.Work_day.search_by_parameter(employee.id, work.date)
+    assert work, "Work day not found after add"
+    assert work.id == 1, "The update failed"
+    work.day_over(5000, datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
+    updated = models.Work_day.search_by_parameter(employee.id, datetime.datetime.now().strftime("%Y/%m/%d"))
+    assert updated.payment >= 5000, "Work day payment failed"
 
 def test_expenses(category):
     expense = models.Expense(
@@ -139,9 +135,9 @@ def test_expenses(category):
         name="Test Expense",
         category_id=category.id,
         amount=50000,
-        datetime=datetime.datetime.now()
+        datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     )
-    expense.add()
+    assert expense.add() != False, "There's a unique contrait fail"
     result = models.Expense.search_by_parameter("name", "Test Expense")
     assert result, "Expense not found after add"
     assert result.amount == 50000, "Expense amount mismatch"
@@ -159,10 +155,10 @@ def test_loans(supplier, config):
         id=None,
         supplier_id=supplier.id,
         amount=500000,
-        loan_date="2026-06-20",
+        date="2026-06-20",
         installments=3
     )
-    loan.add()
+    assert loan.add() != False, "There's a unique contrait fail"
     result = models.Loan.search_by_parameter("suppliers_id", supplier.id)
     assert result, "Loan not found after add"
     assert result.id != None, "id is not updated"
@@ -170,12 +166,14 @@ def test_loans(supplier, config):
     assert result.state == "ACTIVE", "Loan state mismatch"
     assert result.installments == 3, "Loan installments mismatch"
     result.determine_payments_dates("MONTHLY")
-    installments = config.fetch_by_id(models.Loan.MAIN_TABLE, result.id, models.Loan.SECONDARY_TABLE)
+    installments = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
     assert installments, "Installments not found"
+    for i, installment in enumerate(installments): assert int(installment[3][6]) == 6+i
     assert len(installments) == 3, "Installments count mismatch"
     assert installments[0][4] == "UNPAID", "Installment state mismatch"
     result.update_installment_state(installments[0][0], "PAID")
-    updated = config.fetch_by_id(models.Loan.MAIN_TABLE, loan.id, models.Loan.SECONDARY_TABLE)
+    updated = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
+    assert updated, "update failed"
     assert updated[0][4] == "PAID", "Installment state update failed"
     result.delete()
     deleted = models.Loan.search_by_parameter("suppliers_id", supplier.id)

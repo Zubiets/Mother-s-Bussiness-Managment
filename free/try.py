@@ -1,5 +1,3 @@
+greeting = "hola"
 
-import datetime
-
-
-print(type(datetime.datetime.now().date()))
+print(type(greeting[3]))

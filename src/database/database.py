@@ -147,7 +147,7 @@ def create_tables(db):
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'suppliers_id': 'INTEGER NOT NULL',
         'amount': 'REAL NOT NULL',
-        'loan_date': 'DATE NOT NULL',
+        'date': 'DATE NOT NULL',
         'installments': 'INTEGER NOT NULL',
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'FOREIGN KEY(suppliers_id)': 'REFERENCES supplier(id)'
@@ -155,11 +155,11 @@ def create_tables(db):
 
     db.create_table('installments_details', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'loan_id': 'INTEGER NOT NULL',
+        'loans_id': 'INTEGER NOT NULL',
         'number': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
         'state': "TEXT NOT NULL DEFAULT 'UNPAID'",
-        'FOREIGN KEY(loan_id)': 'REFERENCES loans(id)'
+        'FOREIGN KEY(loans_id)': 'REFERENCES loans(id)'
     })
 
     db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
