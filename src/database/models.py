@@ -20,8 +20,7 @@ class Crud:   # Create(in database module), Read, Update and Delete
     
     # only use for UI create functionalities
     def add(self):
-        "To verify don't repeat values, this function will return a False in case of unique contrait"
-        return db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
+        db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
 
     # delete a row from the table, only be used with tables no needed for other tables
     def delete(self):
@@ -109,9 +108,9 @@ class Sale(Crud):
         self.total_price += price * quantity
 
     def get_sale_details(self):
-        return db.execute_query("""SELECT products.name, quantity, products.price FROM sale_details
+        return db.execute_query("""SELECT products.name, sale_details.quantity, products.price FROM sale_details
                                                 JOIN products ON sale_details.product_id = products.id
-                                                WHERE sale_id = ?""", (self.id,))
+                                                WHERE sale_details.sale_id = ?""", (self.id, ))
 
     def update_sale_detail(self, product_id: int, quantity: int, price: int):
         db.execute_query("UPDATE sale_details SET quantity = ? WHERE sale_id = ? AND product_id = ?", 
@@ -197,7 +196,7 @@ class Loan(Crud_two_tables):
             if time_intervals == "SEMANAL": # in spanish to make short some parts of the UI
                 payment_date = loan_date + datetime.timedelta(weeks=i)
             elif time_intervals == "QUINCENAL":
-                payment_date = loan_date + datetime.timedelta(weeks=2*i)
+                payment_date = loan_date + datetime.timedelta(days=15)
             elif time_intervals == "MENSUAL":
                 payment_date = dateutil.relativedelta.relativedelta(months=i) # is used the timeutil to make easier the calculate
                 payment_date = loan_date + payment_date
@@ -213,17 +212,16 @@ class User:
         self.password = password
     
     def check_password(self): # use the security function check password from Werzeuk library
-        return check_password_hash(
-            db.execute_query("SELECT password FROM users WHERE name = ?", (self.username,))
-                                            , self.password)
+        password = db.execute_query("SELECT password FROM users WHERE username = ?", (self.username,))
+        return check_password_hash(password[0][0], self.password) and len(password) == 1
 
     def set_user(self):
-        db.execute_query("INSERT INTO users (name, password) VALUES (?, ?)", 
+        db.execute_query("INSERT INTO users (username, password) VALUES (?, ?)", 
                                         (self.username, generate_password_hash(self.password))) 
                                                         # learned in cs50, save with hash for security
 
     def update_password(self):
-        db.execute_query("UPDATE users SET password = ? WHERE name = ?", generate_password_hash(self.password), self.username)
+        db.execute_query("UPDATE users SET password = ? WHERE username = ?", (generate_password_hash(self.password), self.username))
     
     def delete_user(self):
-        db.execute_query("DELETE FROM users WHERE name = ?", (self.username,))
+        db.execute_query("DELETE FROM users WHERE username = ?", (self.username,))

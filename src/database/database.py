@@ -12,7 +12,6 @@ class Database:
             print(f"Connected to database: {self.db_path}")
         except sqlite3.Error as e:
             print(f"Error connecting to database: {e}")
-            return False
 
     def disconnect(self):
         if self.connection:
@@ -34,7 +33,6 @@ class Database:
             return cursor.fetchall()
         except sqlite3.Error as e:
             print(f"Error executing query: {e}")
-            return False
         
     def create_table(self, table_name, columns: dict):
         columns_str = ", ".join([f"{col} {dtype}" for col, dtype in columns.items()])
@@ -172,8 +170,7 @@ def create_tables(db):
 # App's predetermine database connection and tables creation
 def predet_connection(db: Database):
     db.connect()
-    if db == False:
-        return "Connection failed"
     create_tables(db)
+    
 
 

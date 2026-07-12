@@ -4,14 +4,12 @@ import datetime
 
 @pytest.fixture
 def config():
-    try:
-        clean_db = database.Database(":memory:")
-        print(database.predet_connection(clean_db))
-        assert clean_db.connection is not None, "Database connection should be established"
-        models.db = clean_db
-        yield clean_db
-    finally:
-        clean_db.disconnect()
+    clean_db = database.Database(":memory:")
+    database.predet_connection(clean_db)
+    assert clean_db.connection is not None, "Database connection should be established"
+    models.db = clean_db
+    yield clean_db
+    clean_db.disconnect()
 
 @pytest.fixture
 def supplier(config):
@@ -86,10 +84,13 @@ def test_products(product, category):
     result = models.Product.search_by_parameter("name", "Test Product")
     assert not result, "Product not deleted"
 
-def test_sales(sale, product):
+def test_sales(sale, product, config):
     assert sale, "Sale not found after add"
     assert sale.total_price == 0, "Sale total price mismatch"
     sale.add_sale_detail(product_id=product.id, quantity=2, price=5000)
+    buffer = config.execute_query("""SELECT products.name, sale_details.quantity, products.price FROM sale_details
+                                                JOIN products ON sale_details.product_id = products.id
+                                                WHERE sale_details.sale_id = 1""")
     details = sale.get_sale_details()
     assert details, "Sale details not found"
     assert len(details) == 1, "Unexpected number of sale details"
@@ -157,7 +158,7 @@ def test_loans(supplier, config):
         id=None,
         supplier_id=supplier.id,
         amount=500000,
-        date="2026-06-20",
+        date="2026/06/20",
         installments=3
     )
     assert loan.add() != False, "There's a unique contrait fail"
@@ -167,7 +168,7 @@ def test_loans(supplier, config):
     assert result.amount == 500000, "Loan amount mismatch"
     assert result.state == "ACTIVE", "Loan state mismatch"
     assert result.installments == 3, "Loan installments mismatch"
-    result.determine_payments_dates("MENSUALMENTE")
+    result.determine_payments_dates("MENSUAL")
     installments = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
     assert installments, "Installments not found"
     for i, installment in enumerate(installments): assert int(installment[3][6]) == 6+i
@@ -180,3 +181,23 @@ def test_loans(supplier, config):
     result.delete()
     deleted = models.Loan.search_by_parameter("suppliers_id", supplier.id)
     assert not deleted, "Loan not deleted"
+
+def test_user(config):
+    user = models.User(username="test_user", password="test_password")
+    user.set_user()
+    
+    # check password correct
+    assert user.check_password(), "Password check failed"
+    
+    # check wrong password
+    wrong_user = models.User(username="test_user", password="wrong_password")
+    assert not wrong_user.check_password(), "Wrong password should fail"
+    
+    # update password
+    user.password = "new_password"
+    user.update_password()
+    
+    # delete
+    user.delete_user()
+    result = models.db.execute_query("SELECT * FROM users WHERE username = ?", ("test_user",))
+    assert not result, "User not deleted"
