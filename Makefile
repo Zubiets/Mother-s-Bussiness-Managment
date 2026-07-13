@@ -4,11 +4,11 @@ init:
 	pip install -r requirements.txt
 
 venv:
-	python -m venv venv
+	python3 -m venv venv
 	. venv/bin/activate
 
 test:
 	python -m pytest
 
 run:
-	TCL_LIBRARY_PATH=/usr/share/tcltk/tcl8.6 TK_LIBRARY_PATH=/usr/share/tcltk/tk8.6 ./venv/bin/python main.py
+	python -m main

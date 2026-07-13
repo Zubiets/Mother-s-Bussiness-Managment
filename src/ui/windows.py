@@ -1,11 +1,5 @@
 import customtkinter as ctk
-from frames.caja import CajaFrame
-from frames.inventory import InventoryFrame
-from frames.suppliers import SuppliersFrame
-from frames.employees import EmployeesFrame
-from frames.expenses import ExpensesFrame
-from frames.reports import ReportsFrame
-from frames.loans import LoansFrame
+from .frames import pos, inventory, suppliers, employees, expenses, reports, loans
 from config import COLORS, NAV_ITEMS
 
 ctk.set_appearance_mode("dark")
@@ -55,7 +49,7 @@ class MainWindow(ctk.CTk):
     def _build_sidebar(self):
         logo = ctk.CTkLabel(
             self.sidebar,
-            text="🛍  Variedades",
+            text="🛍  Mandala y Variedades",
             font=ctk.CTkFont(size=15, weight="bold"),
             text_color=COLORS["text_primary"],
             anchor="w",
@@ -96,13 +90,13 @@ class MainWindow(ctk.CTk):
 
     def _builds(self):
         self.s = {
-            "caja":      CajaFrame(self.content, COLORS),
-            "inventario": InventoryFrame(self.content, COLORS),
-            "suppliers": SuppliersFrame(self.content, COLORS),
-            "employees": EmployeesFrame(self.content, COLORS),
-            "expenses":  ExpensesFrame(self.content, COLORS),
-            "reports":   ReportsFrame(self.content, COLORS),
-            "loans": LoansFrame(self.content, COLORS)
+            "caja":      pos.PosFrame(self.content, COLORS),
+            "inventario": inventory.InventoryFrame(self.content, COLORS),
+            "suppliers": suppliers.SuppliersFrame(self.content, COLORS),
+            "employees": employees.EmployeesFrame(self.content, COLORS),
+            "expenses":  expenses.ExpensesFrame(self.content, COLORS),
+            "reports":   reports.ReportsFrame(self.content, COLORS),
+            "loans": loans.LoansFrame(self.content, COLORS)
         }
         for frame in self.s.values():
             frame.grid(row=0, column=0, sticky="nsew")

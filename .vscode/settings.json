@@ -7,4 +7,37 @@
             "packageManager": "ms-python.python:pip"
         }
     ],
+    "python.analysis.languageServerMode": "default",
+    "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+            "variable": "#e06c75",
+            "variable.defaultLibrary": "#e06c75",
+            "import": "#c678dd",
+            "namespace": "#56b6c2"
+        }
+    },
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": [
+                    "keyword.control.import.python",
+                    "keyword.control.import.from.python"
+                ],
+                "settings": {
+                    "foreground": "#c678dd"
+                }
+            },
+            {
+                "scope": [
+                    "variable",
+                    "variable.parameter",
+                    "support.variable"
+                ],
+                "settings": {
+                    "foreground": "#e06c75"
+                }
+            }
+        ]
+    }
 }
