@@ -2,16 +2,17 @@
 Descripción en 2-3 líneas de qué resuelve.
 
 ## Files
-- `ui/inventory_view.py`
+- `ui/frame/inventory.py`
 - `database/models.py`
 
 ## Technical decisions
-- Usé CTkScrollableFrame porque la lista de productos puede ser larga
+- I use CTkScrollableFrame due to the product list could be long
 - La búsqueda filtra en tiempo real con el evento KeyRelease
 
 ## To do
 - [ ] Agregar paginación si hay más de 100 productos
-- [ ] Validar que el precio no sea negativo
+- [ ] Swap the icons for images (in config) to have it with colors
+- [ ] Add a return button for the frames that are nor home
 
 ## Links
 [[Base-de-datos]] [[POS]]

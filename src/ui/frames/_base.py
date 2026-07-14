@@ -2,11 +2,7 @@ import customtkinter as ctk
 
 
 class BaseFrame(ctk.CTkFrame):
-    """
-    Clase base para todos los frames de la app.
-    Recibe COLORS del MainWindow para mantener consistencia visual.
-    Cada frame hijo debe implementar _build_ui().
-    """
+    """ base class for all the frames in the app, keep consistent"""
 
     def __init__(self, parent, colors: dict):
         super().__init__(
@@ -76,7 +72,7 @@ class BaseFrame(ctk.CTkFrame):
             parent,
             text=text,
             command=command,
-            fg_color=self.COLORS["accent"] if accent else self.COLORS["card"],
+            fg_color=self.COLORS["accent_text"] if accent else self.COLORS["card"],
             hover_color=self.COLORS["accent_hover"] if accent else self.COLORS["card_hover"],
             text_color=self.COLORS["text_primary"],
             corner_radius=8,
@@ -98,5 +94,5 @@ class BaseFrame(ctk.CTkFrame):
         )
 
     def _build_ui(self):
-        """Cada frame hijo implementa aquí su contenido."""
+        """frames own content"""
         pass

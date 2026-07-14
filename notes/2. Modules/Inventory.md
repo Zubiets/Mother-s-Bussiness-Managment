@@ -2,7 +2,7 @@
 This module will have the work of manage the business database, where will have all the functions and classes, and the GUI that will use them.
 
 ## Files
-- `src/ui/inventory_view.py`
+- `src/ui/frames/inventory.py`
 - `src/database/models.py`
 
 ## Technical decisions

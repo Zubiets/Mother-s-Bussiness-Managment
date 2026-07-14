@@ -5,24 +5,22 @@ day: 3
 date until: 06/15/2026
 ---
 
-  
-
 ## 🎯 Day goal
 
-  - Have ready the products frame
+  - Have ready the pos and inventory frame
 
 
 
 ## ✅ I did
 
 
-- [ ] Learn about CTK in [[Custom TKinter]].
+- [x] Learn about CTK in [[Custom TKinter]].
 
 
-- [x] make the code that will create the tables
+- [ ] Have the app base with a good structure, color and design
 
 
-- [x] create tests and make sure all works
+- [ ] Make the first frames: inventory and frames
 
   
 
@@ -32,22 +30,15 @@ date until: 06/15/2026
 
 ## 🧱 Headaches
 
+- VScode didn't recognize Tkinter
+solution: In this occasion the problem was the vs that I had downloaded, it was independent of the system, for that make impossible install some external libraries like Tkinter. The solution was install the Microsoft version online (native btw).  
+
+- The last accent of the sidebar is put apart of the rest.
+Solution: When was created the limit of rows, is important that it depends on the number of items in navigate items list
+
+- The last frame created is the only one is showed on the screen.
+Solution: The build method created all at the same time, the problem is when the user didn't select the last frame, it wasn't going to change to another frame. For solve this i decide to replace the original build, to another that only create a new home frame (for defect will be activated, and it'll can't be eliminated). The other frames only when will be press their button will be created.
   
-
-- Problem with the imports
-
-Solution: There are two parts of this problem. In the main module to execute the package you need to import at least one of the functions. The second part is for access to a file or folder in the project, you need to import or put the path like the file were in the root directory, except for the files in the same folder-package.
-
-- The pytest had been having problems
-
-Solution: use it with the command python -m to be allocated in the root directory.
-
-- The first test put new information in the database that makes failed the other tests
-
-Solution: Delete all information inside the test table.
-
-  
-
 ## 💡 learned
 
   

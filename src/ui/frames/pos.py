@@ -80,7 +80,7 @@ class PosFrame(BaseFrame):
             total_card,
             text="$0",
             font=ctk.CTkFont(size=32, weight="bold"),
-            text_color=self.COLORS["accent"],
+            text_color=self.COLORS["accent_text"],
             anchor="w",
         )
         self.total_label.grid(row=1, column=0, sticky="w", padx=16, pady=(0, 14))
@@ -150,7 +150,7 @@ class PosFrame(BaseFrame):
             cambio = recibido - total
             self.cambio_label.configure(
                 text=f"${cambio:,.0f}",
-                text_color=self.COLORS["success"] if cambio >= 0 else "#EF4444"
+                text_color=self.COLORS["success"] if cambio >= 0 else self.COLORS["fail"]
             )
         except ValueError:
             self.cambio_label.configure(text="$0", text_color=self.COLORS["success"])
