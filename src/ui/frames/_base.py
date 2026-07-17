@@ -77,6 +77,7 @@ class BaseFrame(ctk.CTkFrame):
             text_color=self.COLORS["text_primary"],
             corner_radius=8,
             font=ctk.CTkFont(size=13),
+            cursor="hand2",
             **kwargs,
         )
 

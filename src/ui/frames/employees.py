@@ -15,3 +15,5 @@ class EmployeesFrame(BaseFrame):
             color_key="text_secondary",
         )
         placeholder.grid(row=1, column=0)
+
+    

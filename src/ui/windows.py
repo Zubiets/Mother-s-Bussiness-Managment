@@ -20,7 +20,7 @@ class MainWindow(ctk.CTk):
         self._build_layout()
         self._build_sidebar()
         self.build_frames()
-        self._navigate("")
+        self._navigate("home")
 
     def _build_layout(self):
         self.grid_columnconfigure(1, weight=1)
@@ -47,12 +47,16 @@ class MainWindow(ctk.CTk):
 
 
     def _build_sidebar(self):
-        title = ctk.CTkLabel(
+        title = ctk.CTkButton(
             self.sidebar,
             text="🛍  Mandala y Variedades",
             font=ctk.CTkFont(size=16, weight="bold"),
             text_color=COLORS["sidebar_title"],
             anchor="w",
+            fg_color="transparent",
+            hover=False,
+            cursor="hand2",
+            command=lambda k="home": self._navigate(k)
         )
         title.grid(row=0, column=0, padx=16, pady=(20, 16), sticky="ew")
 
@@ -74,6 +78,7 @@ class MainWindow(ctk.CTk):
                 fg_color="transparent",
                 text_color=COLORS["text_secondary"],
                 hover_color=COLORS["accent_hover"],
+                cursor="hand2",
                 command=lambda k=key: self._navigate(k),
             )
             btn.grid(row=i + 2, column=0, padx=25, pady=2, sticky="ew")
@@ -89,22 +94,17 @@ class MainWindow(ctk.CTk):
     
     def build_frames(self):
             self.frames = {
+            "home":      home.HomeFrame(self.content, COLORS),
             "pos":       pos.PosFrame(self.content, COLORS),
             "inventory": inventory.InventoryFrame(self.content, COLORS),
             "suppliers": suppliers.SuppliersFrame(self.content, COLORS),
             "employees": employees.EmployeesFrame(self.content, COLORS),
             "expenses":  expenses.ExpensesFrame(self.content, COLORS),
             "reports":   reports.ReportsFrame(self.content, COLORS),
-            "loans":     loans.LoansFrame(self.content, COLORS),  
+            "loans":     loans.LoansFrame(self.content, COLORS),
             }
 
-            self._active = home.HomeFrame(self.content, COLORS)
-            self._active.grid(row=0, column=0, sticky="nsew")
-
     def _navigate(self, key: str):
-        if not key:
-            return
-
         if self._active:
             self._active.grid_remove()
 
@@ -121,6 +121,5 @@ class MainWindow(ctk.CTk):
                     text_color=COLORS["accent_text"],
                     hover=True
                 )
-
         self._active = self.frames[key]
         self._active.grid(row=0, column=0, sticky="nsew")

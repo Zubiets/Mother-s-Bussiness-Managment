@@ -6,4 +6,7 @@
  to Datetime, in the format that you decide (string argument to choose the spaces)
  - Time delta: Works like a datetime result after a process, with a specific hour, week, minutes, ETC.
 ## Link
+- Tkinter
+https://docs.python.org/3/library/tkinter.html
+- Custom Tkinter
 https://customtkinter.tomschimansky.com/

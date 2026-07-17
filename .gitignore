@@ -220,3 +220,6 @@ __marimo__/
 # critical data 
 data/
 assets/
+
+# repos
+ctkinter_login/

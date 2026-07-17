@@ -94,6 +94,7 @@ def create_tables(db):
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'datetime': 'DATE NOT NULL',
         'total_price': 'REAL NOT NULL',
+        "payment": 'REAL NOT NULL',
         'discount': 'REAL NOT NULL DEFAULT 0'
     })
 

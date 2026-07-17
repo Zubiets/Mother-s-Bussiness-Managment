@@ -95,10 +95,11 @@ class Supplier(Crud):
         self.state = state
 class Sale(Crud):
     MAIN_TABLE = "sales"
-    def __init__(self, id: int, datetime: str, total_price = 0.0, discount = 0):
+    def __init__(self, id: int, datetime: str, total_price = 0.0, payment=0.0, discount = 0):
         super()._init_(id)
         self.datetime = datetime
         self.total_price = total_price
+        self.payment = payment
         self.discount = discount
 
     # Could be used in another class but it'd difficult more than the necessary

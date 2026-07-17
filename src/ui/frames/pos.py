@@ -8,8 +8,6 @@ class PosFrame(BaseFrame):
         self.set_header("Caja", "Registra ventas y cobra a los clientes")
 
     def _build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
 
         body = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         body.grid(row=1, column=0, sticky="nsew", padx=24, pady=16)
