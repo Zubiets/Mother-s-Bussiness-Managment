@@ -7,3 +7,4 @@ qrcode[pil]
 pyinstaller
 pytest
 werkzeug
+python-dotenv

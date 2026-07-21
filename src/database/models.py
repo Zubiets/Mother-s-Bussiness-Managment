@@ -95,11 +95,12 @@ class Supplier(Crud):
         self.state = state
 class Sale(Crud):
     MAIN_TABLE = "sales"
-    def __init__(self, id: int, datetime: str, total_price = 0.0, payment=0.0, discount = 0):
+    def __init__(self, id: int, datetime: str, total_price = 0.0, payment=0.0, method = "Efectivo", discount = 0):
         super()._init_(id)
         self.datetime = datetime
         self.total_price = total_price
         self.payment = payment
+        self.payment_method = method
         self.discount = discount
 
     # Could be used in another class but it'd difficult more than the necessary
@@ -171,11 +172,12 @@ class Work_day(Crud_two_tables):
 class Expense(Crud_two_tables):
     MAIN_TABLE = 'expenses'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id, amount: float, datetime: str, category: str = ""):
+    def __init__(self, id: int, name: str, category_id, amount: float, method: str, datetime: str, category: str = ""):
         super()._init_(id)
         self.name = name
         self.categories_id = category_id
         self.amount = amount
+        self.payment_method = method
         self.datetime = datetime
         self.category = category
     
@@ -203,8 +205,8 @@ class Loan(Crud_two_tables):
                 payment_date = loan_date + payment_date
             db.execute_query("INSERT INTO installments_details (loans_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y/%m/%d")))
 
-    def update_installment_state(self, id, state):
-        db.execute_query("UPDATE installments_details SET state = ? WHERE id = ?", (state, id))
+    def update_installment_state(self, id, state: str = "Paid", method: str = "Efectivo"):
+        db.execute_query("UPDATE installments_details SET state = ?, payment_method = ? WHERE id = ?", (state, method, id))
 
 
 class User:
@@ -214,7 +216,8 @@ class User:
     
     def check_password(self): # use the security function check password from Werzeuk library
         password = db.execute_query("SELECT password FROM users WHERE username = ?", (self.username,))
-        return check_password_hash(password[0][0], self.password) and len(password) == 1
+        if len(password) == 1:
+            return check_password_hash(password[0][0], self.password)
 
     def set_user(self):
         db.execute_query("INSERT INTO users (username, password) VALUES (?, ?)", 

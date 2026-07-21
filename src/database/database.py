@@ -95,6 +95,7 @@ def create_tables(db):
         'datetime': 'DATE NOT NULL',
         'total_price': 'REAL NOT NULL',
         "payment": 'REAL NOT NULL',
+        "payment_method": "REAL NOT NULL DEFAULT 'Efectivo'",
         'discount': 'REAL NOT NULL DEFAULT 0'
     })
 
@@ -138,6 +139,7 @@ def create_tables(db):
         'name': 'TEXT NOT NULL',
         'categories_id': 'INTEGER NOT NULL',
         'amount': 'REAL NOT NULL',
+        "payment_method": "REAL NOT NULL DEFAULT 'Efectivo'",
         'datetime': 'DATE NOT NULL',
         'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
     })
@@ -157,6 +159,7 @@ def create_tables(db):
         'loans_id': 'INTEGER NOT NULL',
         'number': 'INTEGER NOT NULL',
         'date': 'DATE NOT NULL',
+        "payment_method": "REAL NOT NULL DEFAULT 'Efectivo'",
         'state': "TEXT NOT NULL DEFAULT 'UNPAID'",
         'FOREIGN KEY(loans_id)': 'REFERENCES loans(id)'
     })

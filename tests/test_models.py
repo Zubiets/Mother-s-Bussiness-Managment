@@ -138,6 +138,7 @@ def test_expenses(category):
         name="Test Expense",
         category_id=category.id,
         amount=50000,
+        method="Efectivo",
         datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     )
     assert expense.add() != False, "There's a unique contrait fail"
@@ -173,11 +174,11 @@ def test_loans(supplier, config):
     assert installments, "Installments not found"
     for i, installment in enumerate(installments): assert int(installment[3][6]) == 6+i
     assert len(installments) == 3, "Installments count mismatch"
-    assert installments[0][4] == "UNPAID", "Installment state mismatch"
-    result.update_installment_state(installments[0][0], "PAID")
+    assert installments[0][5] == "UNPAID", "Installment state mismatch"
+    result.update_installment_state(installments[0][0], "PAID", )
     updated = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
     assert updated, "update failed"
-    assert updated[0][4] == "PAID", "Installment state update failed"
+    assert updated[0][5] == "PAID", "Installment state update failed"
     result.delete()
     deleted = models.Loan.search_by_parameter("suppliers_id", supplier.id)
     assert not deleted, "Loan not deleted"

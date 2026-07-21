@@ -2,15 +2,13 @@ import customtkinter as ctk
 from .frames import pos, inventory, suppliers, employees, expenses, reports, loans, home
 from config import COLORS, NAV_ITEMS, VERSION
 
-ctk.set_default_color_theme("blue")
-
 
 class MainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("Mandala y Variedades")
-        self.geometry("1200x750")
+        self.geometry("1920x1080")
         self.configure(fg_color=COLORS["bg"])
 
         self._active = None

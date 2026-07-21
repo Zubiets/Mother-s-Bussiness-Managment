@@ -3,7 +3,7 @@ COLORS = {
     "sidebar":        "#2A1F4A",  # dark purple
     "sidebar_title":  "#9d82f1",  # light purple
     "card":           "#FFFFFF",  # white
-    "card_hover":     "#F5FFFD",  # light color, no white
+    "card_hover":     "#dfdae0",  # light color, no white
     "text_soft":      "#1A4A35",  # dark green
     "accent_hover":   "#3D3558",  # purple
     "accent_soft":    "#A0FFD6",  # aqua
@@ -12,10 +12,11 @@ COLORS = {
     "fail":           "#FF0000",  # red
     "text_primary":   "#1A3A30",  # dark green
     "text_secondary": "#6699AA",  # light blue
-    "border":         "#D4F5E8",  # bordes suaves
+    "border":         "#A69F9F",  # bordes suaves
     "sidebar_text":   "#6655AA",  # texto sidebar inactivo
     "highlight":      "#7C3AED",  # near to purple to contrast
-    "highlight_soft": "#EDE9FE",  # too light purple
+    "highlight_soft": "#926AD8",  # too light purple
+    "login":          "#E8E8E8"   # white based on the image
 }
 
 NAV_ITEMS = [
@@ -27,5 +28,14 @@ NAV_ITEMS = [
     ("📊", "Reportes",    "reports"),
     ("🤝", "Préstamos",   "loans")
 ]
+
+PAYMENT_METHODS = {
+    ("", "Efectivo"),
+    ("", "Nequi"),
+    ("", "Bancolombia"),
+    ("", "Daviplata"),
+    ("", "Otros")
+}
+
 
 VERSION = "v1.0.0"

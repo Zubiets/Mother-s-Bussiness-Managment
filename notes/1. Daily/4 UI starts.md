@@ -7,7 +7,7 @@ date until: 06/15/2026
 
 ## 🎯 Day goal
 
-  - Have ready the pos and inventory frame
+  - Have ready the login and the first frame
 
 
 
@@ -17,10 +17,11 @@ date until: 06/15/2026
 - [x] Learn about CTK in [[Custom TKinter]].
 
 
-- [ ] Have the app base with a good structure, color and design
+- [x] Have the app base with a good structure, color and design
 
+- [x] Over the login window
 
-- [ ] Make the first frames: inventory and frames
+- [ ] Make the first frame: POS
 
   
 
@@ -38,6 +39,9 @@ Solution: When was created the limit of rows, is important that it depends on th
 
 - The last frame created is the only one is showed on the screen.
 Solution: The build method created all at the same time, the problem is when the user didn't select the last frame, it wasn't going to change to another frame. For solve this i decide to replace the original build, to another that only create a new home frame (for defect will be activated, and it'll can't be eliminated). The other frames only when will be press their button will be created.
+
+- The windows is put in the screen corner
+Solution: using [[screen info]] we can get the PC dimensions, and with these, calculate the position where the windows will be in the center
   
 ## 💡 learned
 

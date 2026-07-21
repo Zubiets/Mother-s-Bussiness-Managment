@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "4. Web tools/Python libraries/Custom TKinter.md",
+                "file": "2. Modules/Login.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Custom TKinter"
+              "title": "Login"
             }
           }
         ],
@@ -93,7 +93,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 200.5
   },
   "right": {
     "id": "10db4c37b8d5d559",
@@ -195,22 +195,25 @@
       "bases:Create new base": false
     }
   },
-  "active": "71f59e54ea31e472",
+  "active": "0a5e2fa296d1f7a4",
   "lastOpenFiles": [
-    "1. Daily/4 UI start.md",
+    "1. Daily/4 UI starts.md",
+    "2. Modules/Login.md",
     "2. Modules/POS.md",
-    "2. Modules/Reporting.md",
+    "4. Web tools/Python libraries/screen info.md",
     "3. Bugs/Key Bugs details.md",
-    "2. Modules/Test.md",
-    "2. Modules/Inventory.md",
     "1. Daily/3 Models creation.md",
-    "4. Web tools/Python libraries/SQLite3.md",
+    "2. Modules/Test.md",
     "4. Web tools/Python libraries/Pytest.md",
     "4. Web tools/Python libraries/dateutil.md",
-    "4. Web tools/Python libraries/datetime.md",
-    "4. Web tools/Python libraries/Custom TKinter.md",
-    "4. Web tools/Python libraries/*Python official documentation*.md",
+    "4. Web tools/Python libraries/SQLite3.md",
     "'Words.md",
+    "Base-de-datos.md",
+    "2. Modules/Reporting.md",
+    "4. Web tools/Python libraries/Custom TKinter.md",
+    "2. Modules/Inventory.md",
+    "4. Web tools/Python libraries/datetime.md",
+    "4. Web tools/Python libraries/*Python official documentation*.md",
     "1. Daily/2 SQL DESIGN.md",
     "2. Modules/database/Database structure.md",
     "2. Modules/database/Database details.md",
@@ -229,12 +232,9 @@
     "3332-03-31.md",
     "Modules/Untitled.canvas",
     "Modules/Untitled.base",
-    "Base-de-datos.md",
-    "README.md",
     "Pasted image 20260613031848.png",
     "4. Web tools",
     "Week_1/Untitled.base",
-    "3. Bugs",
-    "Welcome.md"
+    "3. Bugs"
   ]
 }

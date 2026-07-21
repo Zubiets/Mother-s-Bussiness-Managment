@@ -1,10 +1,25 @@
-from src.ui import windows 
+import os
+from dotenv import load_dotenv
+from src.ui import login
+from src.database import database, models
+
+# upload variables from .env
+load_dotenv()
 
 
 def main():
     print("Welcome to the Inventory Management System!")
-    app = windows.MainWindow()
-    app.mainloop()
+
+    db = database.Database("data/inventory.db")
+    database.predet_connection(db)
+    models.db = db
+
+    if not db.fetch_table("users"):
+        default = models.User(os.getenv("MAIN_USER"), os.getenv("PASSWORD"))
+        default.set_user()
+
+    verification = login.Login()
+    verification.mainloop()
 
 if __name__ == "__main__":
     try:

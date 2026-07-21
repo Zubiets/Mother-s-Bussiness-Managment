@@ -18,8 +18,3 @@ This module will be used to verify all in the application works with tools that 
 ## To do
 
 - [ ] Add all kind of new functionality that affect to the back end 
-
-
-## Links
-
-[[Base-de-datos]] [[POS]]
