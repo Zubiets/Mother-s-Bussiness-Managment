@@ -164,6 +164,14 @@ def create_tables(db):
         'FOREIGN KEY(loans_id)': 'REFERENCES loans(id)'
     })
 
+    db.create_table("tasks", {
+        'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        'name': 'TEXT NOT NULL',
+        'datetime': 'DATE NOT NULL',
+        'description': 'TEXT NOT NULL',
+        'state': "TEXT NOT NULL DEFAULT 'PENDING'"
+    })
+
     db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")
     db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_code ON products(qr_code)")
     db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_username ON users(username)")

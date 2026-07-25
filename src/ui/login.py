@@ -18,7 +18,8 @@ HORIZONTAL_PIXELS = get_monitors()[0].width
 
 ctk.set_appearance_mode = "light"
 main_image = ctk.CTkImage(light_image=Image.open("assets/login_wallpaper.jpg"), size=(600, 600))
-
+show_password_image = ctk.CTkImage(light_image=Image.open("assets/show.png"), size=(23, 28))
+hide_password_image = ctk.CTkImage(light_image=Image.open("assets/hide.png"), size=(23, 28))
 
 class Login(ctk.CTk):
     x_coor = int(HORIZONTAL_PIXELS/2-LOGIN_SCREEN_SIZE/2)
@@ -32,14 +33,14 @@ class Login(ctk.CTk):
         self.configure(fg_color=COLORS["bg"])
         self.verification = None
 
-        self.bind("<Return>", lambda event: self.login())
+        self.bind("<Return>", lambda event: self._login())
         self.set_ui()
     
     def set_ui(self):
         wallpaper = ctk.CTkLabel(self, image=main_image)
         wallpaper.place(relx=0.5, rely=0.5, anchor="center")
 
-        frame = ctk.CTkFrame(self, fg_color=COLORS["login"], width=450, height=300)
+        frame = ctk.CTkFrame(self, fg_color=COLORS["login"], width=500, height=300)
         frame.place(relx=0.5, rely=0.42, anchor="center")
 
         label = ctk.CTkLabel(frame, text="Inicio de sesion: Mandala y Variedades", 
@@ -74,7 +75,22 @@ class Login(ctk.CTk):
                                            )
         self.entry_password.pack(pady=5, padx=10)
 
-        btn = ctk.CTkButton(frame, 
+        self.show_password_button = ctk.CTkButton(self,
+                                width=29,
+                                height=30,
+                                text="",
+                                corner_radius=50,
+                                image=show_password_image,
+                                fg_color=COLORS["login"],
+                                bg_color=COLORS["login"],
+                                border_color=COLORS["login"],
+                                hover_color=COLORS["card_hover"],
+                                cursor="hand2",
+                                command=self._showPassword
+                            )
+        self.show_password_button.place(x=450, y=237)
+
+        login_btn = ctk.CTkButton(frame, 
                                 width=300,
                                 height=40,
                                 text="Iniciar sesión",
@@ -83,11 +99,11 @@ class Login(ctk.CTk):
                                 fg_color=COLORS["highlight"],
                                 hover_color=COLORS["highlight_soft"],
                                 cursor="hand2",
-                                command=self.login
+                                command=self._login
                             )
-        btn.pack(pady=7)
+        login_btn.pack(pady=7)
 
-        btn = ctk.CTkButton(frame, 
+        change_pswd_btn = ctk.CTkButton(frame, 
                                 width=300,
                                 height=40,
                                 text="¿contraseña olvidada?",
@@ -98,17 +114,17 @@ class Login(ctk.CTk):
                                 border_color=COLORS["login"],
                                 hover_color=COLORS["card_hover"],
                                 cursor="hand2",
-                                command=self.verificate,
+                                command=self._verificate,
                             )
-        btn.pack(pady=1)
+        change_pswd_btn.pack(pady=1)
 
-    def verificate(self):
+    def _verificate(self):
         if self.verification:
             self.verification.destroy()  # if window exists destroy it  
 
         self.verification = Verification() 
     
-    def login(self):
+    def _login(self):
             login = User(self.entry_user.get(), self.entry_password.get())
             if login.check_password():
                 # messagebox.showinfo("Iniciar sesion", f"Bienvenida {self.entry_user.get()}!", parent=self)
@@ -117,6 +133,14 @@ class Login(ctk.CTk):
                 app.mainloop()
             else:
                 messagebox.showerror("Iniciar sesion", "Los datos ingresados son incorrectos", parent=self)
+            
+    def _showPassword(self):
+        if self.entry_password.cget("show") == "*":
+            self.entry_password.configure(show="")
+            self.show_password_button.configure(image=hide_password_image)
+        else:
+            self.entry_password.configure(show="*")
+            self.show_password_button.configure(image=show_password_image)
 
 class Verification(ctk.CTkToplevel):
     x_coor = int(HORIZONTAL_PIXELS/2-VERIFICATION_SCREEN_SIZE/2)
@@ -130,7 +154,7 @@ class Verification(ctk.CTkToplevel):
         self.resizable(False, False)
         self.configure(fg_color=COLORS["bg"])
 
-        self.bind("<Return>", lambda event: self.change_password())
+        self.bind("<Return>", lambda event: self._changePassword())
         self.build_ui()
     
     def build_ui(self):
@@ -139,7 +163,7 @@ class Verification(ctk.CTkToplevel):
                                    font=ctk.CTkFont(size=17, weight="bold"),
                                    text_color="black",
                                    )
-        key_label.pack(pady=4, padx=10)
+        key_label.pack(pady=(5,0), padx=10)
         self.entry_key = ctk.CTkEntry(self, show="*",
                                 width=250,
                                 height=35,
@@ -147,14 +171,15 @@ class Verification(ctk.CTkToplevel):
                                 text_color="black",
                                 font=ctk.CTkFont(size=15,)
                                    )
-        self.entry_key.pack(pady=4, padx=10)
+        self.entry_key.pack(pady=(1,4), padx=10)
 
         user_label = ctk.CTkLabel(self, 
                                    text="Ingresar usuario principal",
                                    font=ctk.CTkFont(size=17, weight="bold"),
                                    text_color="black",
                                    )
-        user_label.pack(pady=4, padx=10)
+        user_label.pack(pady=(5,0), padx=10)
+
         self.entry_user = ctk.CTkEntry(self, 
                                 width=250,
                                 height=35,
@@ -162,32 +187,35 @@ class Verification(ctk.CTkToplevel):
                                 text_color="black",
                                 font=ctk.CTkFont(size=15,)
                                 )
-        self.entry_user.pack(pady=4, padx=10)
+        self.entry_user.pack(pady=(1,4), padx=10)
 
         password_label = ctk.CTkLabel(self, 
                                    text="Ingresar la nueva contraseña",
                                    font=ctk.CTkFont(size=17, weight="bold"),
                                    text_color="black")
-        password_label.pack(pady=4, padx=10)
+        password_label.pack(pady=(5,0), padx=10)
+
         self.entry_password = ctk.CTkEntry(self, show="*",
                                 width=250,
                                 height=35,
                                 fg_color="transparent",
                                 text_color="black"
                                       )
-        self.entry_password.pack(pady=4, padx=10)
+        self.entry_password.pack(pady=(1,4), padx=10)
 
         btn = ctk.CTkButton(self,
                                 width=250,
                                 height=50,
+                                fg_color="black",
+                                hover_color="gray",
                                 text="Cambiar contraseña",
                                 font=ctk.CTkFont(size=16,),
                                 cursor="hand2",
-                                command=self.change_password,
+                                command=self._changePassword,
                             )
         btn.pack(pady=15)
     
-    def change_password(self):
+    def _changePassword(self):
         if self.entry_key.get() == os.getenv("RECOVERY_KEY") and self.entry_user.get() == os.getenv("MAIN_USER"):
             updated = User(self.entry_user.get(), self.entry_password.get())
             updated.update_password()
@@ -195,3 +223,4 @@ class Verification(ctk.CTkToplevel):
             self.destroy()
         else:
             messagebox.showerror("Cambiar Contraseña", "Los datos ingresados son incorrectos", parent=self)
+

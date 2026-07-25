@@ -202,3 +202,35 @@ def test_user(config):
     user.delete_user()
     result = models.db.execute_query("SELECT * FROM users WHERE username = ?", ("test_user",))
     assert not result, "User not deleted"
+
+def test_task(config):
+    # Add
+    task = models.Task(
+        id=None,
+        name="Pedir mercancía",
+        datetime="2026-07-20 09:00:00",
+        description="Llamar al proveedor de maquillaje"
+    )
+    task.add()
+
+    # Search by name
+    result = models.Task.search_by_parameter("name", "Pedir mercancía")
+    assert result, "task not found after add"
+    assert result.state == "PENDING", "task default state mismatch"
+    assert result.description == "Llamar al proveedor de maquillaje", "task description mismatch"
+
+    # Search by month
+    july_tasks = models.Task.search_by_month("2026", "July")
+    assert july_tasks, "No tasks found for July"
+    assert any(t.name == "Pedir mercancía" for t in july_tasks), "Task not found in July results"
+
+    # Update state
+    result.state = "DONE"
+    result.update()
+    updated = models.Task.search_by_parameter("name", "Pedir mercancía")
+    assert updated.state == "DONE", "Task state update failed"
+
+    # Delete
+    result.delete()
+    deleted = models.Task.search_by_parameter("name", "Pedir mercancía")
+    assert not deleted, "task not deleted"

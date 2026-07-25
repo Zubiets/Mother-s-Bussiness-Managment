@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from src.ui import login
+from src.ui import app
 from src.database import database, models
 
 # upload variables from .env
@@ -18,8 +18,8 @@ def main():
         default = models.User(os.getenv("MAIN_USER"), os.getenv("PASSWORD"))
         default.set_user()
 
-    verification = login.Login()
-    verification.mainloop()
+    login = app.MainWindow()
+    login.mainloop()
 
 if __name__ == "__main__":
     try:

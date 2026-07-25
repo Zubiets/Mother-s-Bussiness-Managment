@@ -16,7 +16,8 @@ COLORS = {
     "sidebar_text":   "#6655AA",  # texto sidebar inactivo
     "highlight":      "#7C3AED",  # near to purple to contrast
     "highlight_soft": "#926AD8",  # too light purple
-    "login":          "#E8E8E8"   # white based on the image
+    "login":          "#E8E8E8",  # white based on the image
+    "suggest_hover":  "#B0DFCA"   # light aqua
 }
 
 NAV_ITEMS = [

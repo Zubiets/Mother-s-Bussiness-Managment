@@ -58,11 +58,11 @@ class BaseFrame(ctk.CTkFrame):
             **kwargs,
         )
 
-    def make_label(self, parent, text, size=13, color_key="text_primary", **kwargs):
+    def make_label(self, parent, text, size=18, color_key="text_primary", **kwargs):
         return ctk.CTkLabel(
             parent,
             text=text,
-            font=ctk.CTkFont(size=size),
+            font=ctk.CTkFont(size=17),
             text_color=self.COLORS[color_key],
             **kwargs,
         )
@@ -76,7 +76,7 @@ class BaseFrame(ctk.CTkFrame):
             hover_color=self.COLORS["accent_hover"] if accent else self.COLORS["card_hover"],
             text_color=self.COLORS["text_primary"],
             corner_radius=8,
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=15),
             cursor="hand2",
             **kwargs,
         )
@@ -90,7 +90,7 @@ class BaseFrame(ctk.CTkFrame):
             text_color=self.COLORS["text_primary"],
             placeholder_text_color=self.COLORS["text_secondary"],
             corner_radius=8,
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=15),
             **kwargs,
         )
 

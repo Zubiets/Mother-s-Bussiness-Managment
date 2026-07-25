@@ -2,6 +2,7 @@ from . import database
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 import dateutil
+import calendar
 
 
 db: database.Database = None
@@ -13,7 +14,7 @@ class Crud:   # Create(in database module), Read, Update and Delete
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
-        result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
+        result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} LIKE ?", (value, ))
         if len(result) == 1:
             return cls(*result[0])  # unpack the tuple of the row elements
         return result # if not a single row might be for a different result hoped
@@ -24,7 +25,7 @@ class Crud:   # Create(in database module), Read, Update and Delete
 
     # delete a row from the table, only be used with tables no needed for other tables
     def delete(self):
-        db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id = ?", (self.id,))
+        db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id LIKE %?%", (self.id,))
 
     # default class to put the class information into the table
     def update(self):
@@ -207,6 +208,23 @@ class Loan(Crud_two_tables):
 
     def update_installment_state(self, id, state: str = "Paid", method: str = "Efectivo"):
         db.execute_query("UPDATE installments_details SET state = ?, payment_method = ? WHERE id = ?", (state, method, id))
+
+class Task(Crud):
+    MAIN_TABLE = "tasks"
+    def __init__(self, id: int, name: str, datetime: str, description: str, state = "PENDING"):
+        self.id = id
+        self.name = name
+        self.datetime = datetime
+        self.description = description
+        self.state = state
+    
+    @staticmethod
+    def search_by_month(year: str, month: str):
+        month = list(calendar.month_name).index(month)
+        result = db.execute_query(f"SELECT * FROM tasks WHERE strftime('%Y-%m', datetime) = ?", (f"{year}-{month:02d}", )) # the 02d is to fill with a 0 when the number has one digit
+        if result:
+            return [Task(*fila) for fila in result]
+        return result
 
 
 class User:

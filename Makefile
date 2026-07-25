@@ -12,3 +12,6 @@ test:
 
 run:
 	python -m main
+
+seed:
+	python -m seed
