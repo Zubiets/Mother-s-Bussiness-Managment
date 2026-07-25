@@ -217,9 +217,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# critical data 
-data/
-assets/
-
-# repos
-ctkinter_login/
+data/inventory.db
