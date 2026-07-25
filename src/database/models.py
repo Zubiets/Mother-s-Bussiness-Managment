@@ -15,7 +15,9 @@ class Crud:   # Create(in database module), Read, Update and Delete
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
         result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
-        if len(result) >= 1:
+        if len(result) == 1:
+            return cls(*result[0])
+        elif len(result) >= 1:
             return [cls(*fila) for fila in result]
         return result
     
@@ -51,7 +53,9 @@ class Crud_two_tables:
                                                 FROM {cls.MAIN_TABLE}
                                                 JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
                                                 WHERE {cls.MAIN_TABLE}.{parameter} = ?""", (value, ))
-        if len(result) >= 1:
+        if len(result) == 1:
+            return cls(*result[0])
+        elif len(result) >= 1:
             return [cls(*fila) for fila in result]
         return result
 
@@ -60,7 +64,7 @@ class Crud_two_tables:
         result = db.execute_query(f"""SELECT {cls.MAIN_TABLE}.*, {cls.SECONDARY_TABLE}.name
                                                 FROM {cls.MAIN_TABLE}
                                                 JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
-                                                WHERE {cls.MAIN_TABLE}.{parameter} LIKE ? AND (state = 'ACTIVE' OR state = 'UNPAID') """, (f"%{value}%", ))
+                                                WHERE {cls.MAIN_TABLE}.{parameter} LIKE ? AND ({cls.MAIN_TABLE}.state = 'ACTIVE' OR {cls.MAIN_TABLE}.state = 'UNPAID') """, (f"%{value}%", ))
         if len(result) >= 1:
             return [cls(*fila) for fila in result]
         return result
@@ -209,6 +213,9 @@ class Loan(Crud_two_tables):
         self.state = state
         self.supplier = supplier
 
+    def fetch_installments(self):
+        return db.execute_query("SELECT * FROM installments_details WHERE loans_id = ?", (self.id,))
+
     def determine_payments_dates(self, time_intervals: str):
         loan_date = datetime.datetime.strptime(self.date, "%Y/%m/%d")
         for i in range(self.installments):
@@ -226,12 +233,13 @@ class Loan(Crud_two_tables):
 
 class Task(Crud):
     MAIN_TABLE = "tasks"
-    def __init__(self, id: int, name: str, datetime: str, description: str, state = "PENDING"):
+    def __init__(self, id: int, name: str, datetime: str, description: str, state = "PENDING", highlight = "DEACTIVATE"):
         self.id = id
         self.name = name
         self.datetime = datetime
         self.description = description
         self.state = state
+        self.highlight = highlight
     
     @staticmethod
     def search_by_month(year: str, month: str):

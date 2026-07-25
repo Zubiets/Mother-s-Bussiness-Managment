@@ -3,7 +3,7 @@ from src.database import database, models
 import datetime
 
 @pytest.fixture
-def config():
+def test_db():
     clean_db = database.Database(":memory:")
     database.predet_connection(clean_db)
     assert clean_db.connection is not None, "Database connection should be established"
@@ -12,33 +12,33 @@ def config():
     clean_db.disconnect()
 
 @pytest.fixture
-def supplier(config):
+def supplier(test_db):
     s = models.Supplier(id=None, name="Test Supplier", contact_info="123456789")
     assert s.add() != False, "There's a unique contrait fail"
-    return models.Supplier.search_by_parameter("name", "Test Supplier")[0]
+    return models.Supplier.search_by_parameter("name", "Test Supplier")
 
 @pytest.fixture
 def category(supplier):
     c = models.Category(id=None, name="Test Category", supplier_id=supplier.id, description="Test description")
     assert c.add() != False, "There's a unique contrait fail"
-    return models.Category.search_by_parameter("name", "Test Category")[0]
+    return models.Category.search_by_parameter("name", "Test Category")
 @pytest.fixture
 def product(category):
     p = models.Product(id=None, name="Test Product", category_id=category.id, price=5000, qr_code="TEST123")
     assert p.add() != False, "There's a unique contrait fail"
-    return models.Product.search_by_parameter("name", "Test Product")[0]
+    return models.Product.search_by_parameter("name", "Test Product")
 
 @pytest.fixture
 def sale(product):
     s = models.Sale(id=None, datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"), total_price=0, discount=0)
     assert s.add() != False, "There's a unique contrait fail"
-    return models.Sale.search_by_parameter("total_price", 0)[0]
+    return models.Sale.search_by_parameter("total_price", 0)
 
 @pytest.fixture
-def employee(config):
+def employee(test_db):
     e = models.Employee(id=None, name="Test Employee", salary=1500000, contact="3001234567")
     assert e.add() != False, "There's a unique contrait fail"
-    return models.Employee.search_by_parameter("name", "Test Employee")[0]
+    return models.Employee.search_by_parameter("name", "Test Employee")
 
 def test_suppliers(supplier):
     assert supplier, "Supplier not found after add"
@@ -46,7 +46,7 @@ def test_suppliers(supplier):
     assert supplier.contact_info == "123456789", "Supplier contact mismatch"
     supplier.contact_info = "987654321"
     supplier.update()
-    updated = models.Supplier.search_by_parameter("name", "Test Supplier")[0]
+    updated = models.Supplier.search_by_parameter("name", "Test Supplier")
     assert updated.contact_info == "987654321", "Supplier update failed"
     supplier.delete()
     result = models.Supplier.search_by_parameter("name", "Test Supplier")
@@ -58,7 +58,7 @@ def test_categories(category, supplier):
     assert category.suppliers_id == supplier.id, "Category supplier mismatch"
     category.description = "Updated description"
     category.update()
-    updated = models.Category.search_by_parameter("name", "Test Category")[0]
+    updated = models.Category.search_by_parameter("name", "Test Category")
     assert updated.description == "Updated description", "Category update failed"
     category.delete()
     result = models.Category.search_by_parameter("name", "Test Category")
@@ -69,21 +69,21 @@ def test_products(product, category):
     assert product.price == 5000, "Product price mismatch"
     assert product.state == "ACTIVE", "Product state mismatch"
     assert product.categories_id == category.id, "Product category mismatch"
-    result = models.Product.search_by_parameter("qr_code", "TEST123")[0]
+    result = models.Product.search_by_parameter("qr_code", "TEST123")
     assert result, "Product not found by qr_code"
     product.price = 7500
     product.update()
-    updated = models.Product.search_by_parameter("name", "Test Product")[0]
+    updated = models.Product.search_by_parameter("name", "Test Product")
     assert updated.price == 7500, "Product update failed"
     product.amount = 0
     product.update()
-    inactive = models.Product.search_by_parameter("name", "Test Product")[0]
+    inactive = models.Product.search_by_parameter("name", "Test Product")
     assert inactive.state == "INACTIVE", "Product should be INACTIVE when amount is 0"
     product.delete()
     result = models.Product.search_by_parameter("name", "Test Product")
     assert not result, "Product not deleted"
 
-def test_sales(sale, product, config):
+def test_sales(sale, product, test_db):
     assert sale, "Sale not found after add"
     assert sale.total_price == 0, "Sale total price mismatch"
     sale.add_sale_detail(product_id=product.id, quantity=2, price=5000)
@@ -94,7 +94,7 @@ def test_sales(sale, product, config):
     assert details[0][2] == 5000, "Sale detail price mismatch"
     sale.close_sale()
     sale.update()
-    updated = models.Sale.search_by_parameter("total_price", sale.total_price)[0]
+    updated = models.Sale.search_by_parameter("total_price", sale.total_price)
     assert updated, "Sale not found after close"
     sale.delete()
     result = models.Sale.search_by_parameter("total_price", sale.total_price)
@@ -107,7 +107,7 @@ def test_employees(employee):
     assert employee.state == "ACTIVE", "Employee state mismatch"
     employee.salary = 2000000
     employee.update()
-    updated = models.Employee.search_by_parameter("name", "Test Employee")[0]
+    updated = models.Employee.search_by_parameter("name", "Test Employee")
     assert updated.salary == 2000000, "Employee update failed"
     employee.delete()
     result = models.Employee.search_by_parameter("name", "Test Employee")
@@ -138,19 +138,19 @@ def test_expenses(category):
         datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     )
     assert expense.add() != False, "There's a unique contrait fail"
-    result = models.Expense.search_by_parameter("name", "Test Expense")[0]
+    result = models.Expense.search_by_parameter("name", "Test Expense")
     assert result, "Expense not found after add"
     assert result.amount == 50000, "Expense amount mismatch"
     assert result.categories_id == category.id, "Expense category mismatch"
     result.amount = 75000
     result.update()
-    updated = models.Expense.search_by_parameter("name", "Test Expense")[0]
+    updated = models.Expense.search_by_parameter("name", "Test Expense")
     assert updated.amount == 75000, "Expense update failed"
     result.delete()
     deleted = models.Expense.search_by_parameter("name", "Test Expense")
     assert not deleted, "Expense not deleted"
 
-def test_loans(supplier, config):
+def test_loans(supplier, test_db):
     loan = models.Loan(
         id=None,
         supplier_id=supplier.id,
@@ -159,27 +159,27 @@ def test_loans(supplier, config):
         installments=3
     )
     assert loan.add() != False, "There's a unique contrait fail"
-    result = models.Loan.search_by_parameter("suppliers_id", supplier.id)[0]
+    result = models.Loan.search_by_parameter("suppliers_id", supplier.id)
     assert result, "Loan not found after add"
     assert result.id != None, "id is not updated"
     assert result.amount == 500000, "Loan amount mismatch"
     assert result.state == "ACTIVE", "Loan state mismatch"
     assert result.installments == 3, "Loan installments mismatch"
     result.determine_payments_dates("MENSUAL")
-    installments = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
+    installments = result.fetch_installments()
     assert installments, "Installments not found"
     for i, installment in enumerate(installments): assert int(installment[3][6]) == 6+i
     assert len(installments) == 3, "Installments count mismatch"
     assert installments[0][5] == "UNPAID", "Installment state mismatch"
     result.update_installment_state(installments[0][0], "PAID", )
-    updated = config.fetch_by_id('installments_details', result.id, models.Loan.MAIN_TABLE)
+    updated = result.fetch_installments()
     assert updated, "update failed"
     assert updated[0][5] == "PAID", "Installment state update failed"
     result.delete()
     deleted = models.Loan.search_by_parameter("suppliers_id", supplier.id)
     assert not deleted, "Loan not deleted"
 
-def test_user(config):
+def test_user(test_db):
     user = models.User(username="test_user", password="test_password")
     user.set_user()
     
@@ -199,7 +199,7 @@ def test_user(config):
     result = models.db.execute_query("SELECT * FROM users WHERE username = ?", ("test_user",))
     assert not result, "User not deleted"
 
-def test_task(config):
+def test_task(test_db):
     # Add
     task = models.Task(
         id=None,
@@ -231,14 +231,14 @@ def test_task(config):
     deleted = models.Task.search_by_parameter("name", "Pedir mercancía")
     assert not deleted, "task not deleted"
 
-def test_suggestion_search(config):
+def test_suggestion_search(test_db):
     # setup
     supplier = models.Supplier(id=None, name="Test Supplier", contact_info="123456789")
     supplier.add()
-    supplier = models.Supplier.search_by_parameter("name", "Test Supplier")[0]
+    supplier = models.Supplier.search_by_parameter("name", "Test Supplier")
     category = models.Category(id=None, name="Test Category", supplier_id=supplier.id, description="Test")
     category.add()
-    category = models.Category.search_by_parameter("name", "Test Category")[0]
+    category = models.Category.search_by_parameter("name", "Test Category")
     
     # Add multiple products to test list return
     for i in range(3):
