@@ -39,8 +39,7 @@ class PosFrame(BaseFrame):
             height=40,
         )
         self.scan_entry.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 14))
-        self.scan_entry.bind("<KeyRelease>", self._suggest_product)
-        self.scan_entry.bind("<Return>", self._on_scan)
+        self.scan_entry.bind("<Return>", self._suggest_products)
         self.scan_entry.focus()
 
         self.suggestions_box = ctk.CTkScrollableFrame(self,
@@ -48,21 +47,6 @@ class PosFrame(BaseFrame):
                                                       border_color=self.COLORS["border"],
                                                       border_width=1,
                                                       )
-        self.suggestions_box.place(x=40, y=185)
-        self.suggestions_box.grid_configure(column=0, row=10)
-
-        for i in range(1, 11):
-            self.suggestion_button = ctk.CTkButton(self.suggestions_box,
-                                                    width=450,
-                                                    fg_color="transparent",
-                                                    border_color=self.COLORS["border"],
-                                                    border_width=1,
-                                                    text_color=self.COLORS["text_secondary"],
-                                                    hover_color=self.COLORS["suggest_hover"],
-                                                    cursor="hand2",
-                                                    text=f"suggestion:{i}",
-                                                    )
-            self.suggestion_button.grid(row=i, column=0, sticky="ew")
 
         self.make_label(
             scan_card, "Cantidad",
@@ -75,7 +59,7 @@ class PosFrame(BaseFrame):
             height=40,
         )
         self.amount_entry.grid(row=1, column=1, sticky="w", padx=16, pady=(0, 14))
-        self.amount_entry.bind("<Return>", self._on_scan)
+        self.amount_entry.bind("<Return>", self._suggest_products)
 
         self.message_box = ctk.CTkFrame(self,
                                         fg_color=self.COLORS["card"],
@@ -198,10 +182,12 @@ class PosFrame(BaseFrame):
             self.message_box.place(x=520, y=185)
             self.message.pack()
             return
+
         self.message_box.place_forget()
 
         # TODO: buscar producto en models y agregar al carrito
 
+        self.suggestions_box.place_forget()
         self.amount_entry.delete(0, "end")
         self.scan_entry.delete(0, "end")
 
@@ -217,8 +203,27 @@ class PosFrame(BaseFrame):
         except ValueError:
             self.cambio_label.configure(text="$0", text_color=self.COLORS["success"])
 
-    def _suggest_product(self):
-        pass
+    def _suggest_products(self, event=None):
+        product = self.scan_entry.get().strip().lower()
+        if product:
+            self.suggestions_box.place(x=40, y=185)
+            self.suggestions_box.grid_configure(column=0, row=10)
+
+            for i in range(1, 11):
+                self.suggestion_button = ctk.CTkButton(self.suggestions_box,
+                                                        width=450,
+                                                        fg_color="transparent",
+                                                        border_color=self.COLORS["border"],
+                                                        border_width=1,
+                                                        text_color=self.COLORS["text_secondary"],
+                                                        hover_color=self.COLORS["suggest_hover"],
+                                                        cursor="hand2",
+                                                        text=f"suggestion:{i}",
+                                                        )
+                self.suggestion_button.grid(row=i, column=0, sticky="ew")
+
+            
+
 
     def _confirmar_venta(self):
         # TODO: llamar a models.Sale para guardar la venta

@@ -49,15 +49,9 @@ class Database:
         set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
-     
-    def fetch_table(self, table_name):
-        query = f"SELECT * FROM {table_name}"
-        return self.execute_query(query)
+    
 
-    def fetch_by_id(self, table_name: str, id = int, second_table: str = None):
-        if second_table:
-            return self.execute_query(f"SELECT * FROM {table_name} WHERE {second_table}_id = {id}")
-        return self.execute_query(f"SELECT * FROM {table_name} WHERE id = {id}")
+
         
 
 
@@ -169,7 +163,8 @@ def create_tables(db):
         'name': 'TEXT NOT NULL',
         'datetime': 'DATE NOT NULL',
         'description': 'TEXT NOT NULL',
-        'state': "TEXT NOT NULL DEFAULT 'PENDING'"
+        'state': "TEXT NOT NULL DEFAULT 'PENDING'",
+        'highlight': "TEXT NOT NULL DEFAULT 'DEACTIVE'"
     })
 
     db.execute_query("CREATE UNIQUE INDEX IF NOT EXISTS idx_product_name ON products(name)")

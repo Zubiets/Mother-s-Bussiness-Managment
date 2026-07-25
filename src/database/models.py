@@ -14,18 +14,25 @@ class Crud:   # Create(in database module), Read, Update and Delete
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
-        result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} LIKE ?", (value, ))
-        if len(result) == 1:
-            return cls(*result[0])  # unpack the tuple of the row elements
-        return result # if not a single row might be for a different result hoped
+        result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
+        if len(result) >= 1:
+            return [cls(*fila) for fila in result]
+        return result
     
+    @classmethod
+    def suggestion_search(cls, parameter: str, value):
+        result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} LIKE ? AND (state = 'ACTIVE' OR state = 'UNPAID')", (f"%{value}%", ))
+        if len(result) >= 1:
+            return [cls(*fila) for fila in result]
+        return result
+
     # only use for UI create functionalities
     def add(self):
         db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:]))
 
     # delete a row from the table, only be used with tables no needed for other tables
     def delete(self):
-        db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id LIKE %?%", (self.id,))
+        db.execute_query(f"DELETE FROM {self.MAIN_TABLE} WHERE id = ?", (self.id,))
 
     # default class to put the class information into the table
     def update(self):
@@ -44,9 +51,19 @@ class Crud_two_tables:
                                                 FROM {cls.MAIN_TABLE}
                                                 JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
                                                 WHERE {cls.MAIN_TABLE}.{parameter} = ?""", (value, ))
-        if len(result) == 1:
-            return cls(*result[0])  # unpack the tuple of the row elements
-        return result # if not a single row might be for a different result hoped
+        if len(result) >= 1:
+            return [cls(*fila) for fila in result]
+        return result
+
+    @classmethod
+    def suggestion_search(cls, parameter: str, value): # flexible function to read a get query
+        result = db.execute_query(f"""SELECT {cls.MAIN_TABLE}.*, {cls.SECONDARY_TABLE}.name
+                                                FROM {cls.MAIN_TABLE}
+                                                JOIN {cls.SECONDARY_TABLE} ON {cls.MAIN_TABLE}.{cls.SECONDARY_TABLE}_id = {cls.SECONDARY_TABLE}.id
+                                                WHERE {cls.MAIN_TABLE}.{parameter} LIKE ? AND (state = 'ACTIVE' OR state = 'UNPAID') """, (f"%{value}%", ))
+        if len(result) >= 1:
+            return [cls(*fila) for fila in result]
+        return result
 
     def add(self):
         return db.insert_item(f'{self.MAIN_TABLE}', dict(list(vars(self).items())[1:-1]))
@@ -156,10 +173,8 @@ class Work_day(Crud_two_tables):
                                             FROM {Work_day.MAIN_TABLE}
                                             JOIN {Work_day.SECONDARY_TABLE} ON {Work_day.MAIN_TABLE}.employee_id = {Work_day.SECONDARY_TABLE}.id
                                             WHERE {Work_day.MAIN_TABLE}.employee_id = ? AND {Work_day.MAIN_TABLE}.date = ?""", (employee_id, date))
-        if len(result) == 1:
-            return Work_day(*result[0])
-        elif len(result) > 1:
-            return [Product(*fila) for fila in result]
+        if len(result) >= 1:
+            return [Work_day(*fila) for fila in result]
         return result
     
     def day_over(self, extra, time_out: str):
