@@ -217,4 +217,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-.data/inventory.db
+# SQLite database file (by defect the app creates one)
+inventory.db

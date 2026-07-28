@@ -49,7 +49,9 @@ class Database:
         set_str = ", ".join([f"{col} = ?" for col in update_data.keys()])
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
-    
+
+    def fetch_table(self, table_name: str):
+        return self.execute_query(f"SELECT * FROM {table_name}")
 
 
         

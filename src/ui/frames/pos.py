@@ -1,5 +1,8 @@
 import customtkinter as ctk
 from ._base import BaseFrame
+from src.database.models import Sale, Product
+import threading
+import queue
 
 
 class PosFrame(BaseFrame):
@@ -42,11 +45,7 @@ class PosFrame(BaseFrame):
         self.scan_entry.bind("<Return>", self._suggest_products)
         self.scan_entry.focus()
 
-        self.suggestions_box = ctk.CTkScrollableFrame(self,
-                                                      fg_color="transparent",
-                                                      border_color=self.COLORS["border"],
-                                                      border_width=1,
-                                                      )
+        self.suggestions_box = self.make_card(self, )
 
         self.make_label(
             scan_card, "Cantidad",
@@ -65,8 +64,7 @@ class PosFrame(BaseFrame):
                                         fg_color=self.COLORS["card"],
                                           )
 
-        self.message = ctk.CTkLabel(self.message_box, 
-                                    text="Solo escribir números enteros",
+        self.message = ctk.CTkLabel(self.message_box,
                                     text_color=self.COLORS["fail"],
                                     font=ctk.CTkFont(size=15),
                                     fg_color=self.COLORS["card"],
@@ -169,25 +167,34 @@ class PosFrame(BaseFrame):
             height=36,
         ).grid(row=4, column=0, sticky="ew")
 
-    def _on_scan(self, event=None):
-        code = self.scan_entry.get().strip().lower()
+    def _on_scan(self, produc: Product):
         amount = self.amount_entry.get().strip()
 
-        if not code or not amount:
+        if not amount:
+            self.message_box.place(x=520, y=185)
+            self.message.configure(text = "Debe especificar la cantidad del producto")
+            self.message.pack()
             return
         
         try:
             amount = int(amount)
         except ValueError:
             self.message_box.place(x=520, y=185)
+            self.message.configure(text = "Solo escribir números enteros")
             self.message.pack()
             return
 
+        if amount <= 0:
+            self.message_box.place(x=520, y=185)
+            self.message.configure(text = "El valor del monto debe ser mayor a 0")
+            self.message.pack()
+            return
+        
         self.message_box.place_forget()
+        self.suggestions_box.place_forget()
 
         # TODO: buscar producto en models y agregar al carrito
 
-        self.suggestions_box.place_forget()
         self.amount_entry.delete(0, "end")
         self.scan_entry.delete(0, "end")
 
@@ -204,23 +211,39 @@ class PosFrame(BaseFrame):
             self.cambio_label.configure(text="$0", text_color=self.COLORS["success"])
 
     def _suggest_products(self, event=None):
-        product = self.scan_entry.get().strip().lower()
-        if product:
-            self.suggestions_box.place(x=40, y=185)
-            self.suggestions_box.grid_configure(column=0, row=10)
+        for w in self.suggestions_box.winfo_children(): # clean the frame 
+            w.destroy()
 
-            for i in range(1, 11):
-                self.suggestion_button = ctk.CTkButton(self.suggestions_box,
-                                                        width=450,
-                                                        fg_color="transparent",
-                                                        border_color=self.COLORS["border"],
-                                                        border_width=1,
-                                                        text_color=self.COLORS["text_secondary"],
-                                                        hover_color=self.COLORS["suggest_hover"],
-                                                        cursor="hand2",
-                                                        text=f"suggestion:{i}",
-                                                        )
-                self.suggestion_button.grid(row=i, column=0, sticky="ew")
+        product = self.scan_entry.get().strip() # lower is not needed because sql find it anyway
+        if not product:
+            return
+
+        self.suggestions_box.place(x=40, y=185) # prepare the suggestions frame
+        self.suggestions_box.grid_columnconfigure(0, weight=1)
+        self.suggestions_box.grid_rowconfigure(4, weight=1)
+
+        suggested_products = Product.suggestion_search("name", product)
+
+        if not suggested_products:
+            self.make_label(self.suggestions_box, 
+                            text="No se encontro un producto relacionado",
+                            color_key="fail",
+                            ).grid(row=0, column=0, sticky="ew")
+            
+        
+        for i, p in enumerate(suggested_products):
+            self.suggestion_button = ctk.CTkButton(self.suggestions_box,
+                                                    width=450,
+                                                    fg_color="transparent",
+                                                    border_color=self.COLORS["border"],
+                                                    border_width=1,
+                                                    text_color=self.COLORS["text_secondary"],
+                                                    hover_color=self.COLORS["suggest_hover"],
+                                                    cursor="hand2",
+                                                    text=f"{p.name}{' '*20}{p.price}{' '*20}{p.category}",
+                                                    command=lambda product=p: self._on_scan(product),
+                                                    )
+            self.suggestion_button.grid(row=i, column=0, sticky="ew")
 
             
 
