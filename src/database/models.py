@@ -129,10 +129,10 @@ class Sale(Crud):
         self.discount = discount
 
     # Could be used in another class but it'd difficult more than the necessary
-    def add_sale_detail(self, product_id: int, quantity: int, price: int):
+    def add_sale_detail(self, product: Product, quantity: int):
         db.execute_query("INSERT INTO sale_details (sale_id, product_id, quantity) VALUES (?, ?, ?)", 
-                                        (self.id, product_id, quantity))
-        self.total_price += price * quantity
+                                        (self.id, product.id, quantity))
+        self.total_price += product.price * quantity
 
     def get_sale_details(self):
         return db.execute_query("""SELECT products.name, sale_details.quantity, products.price FROM sale_details

@@ -1,15 +1,15 @@
 import customtkinter as ctk
+import tkinter as tk
 from ._base import BaseFrame
 from src.database.models import Sale, Product
-import threading
-import queue
+
 
 
 class PosFrame(BaseFrame):
     def __init__(self, parent, colors):
         super().__init__(parent, colors)
         self.set_header("Caja", "Registra ventas y cobra a los clientes")
-        self.products = None
+        self.cart: list[tuple] = []
 
     def _build_ui(self):
 
@@ -90,7 +90,6 @@ class PosFrame(BaseFrame):
             corner_radius=0,
         )
         self.cart_scroll.grid(row=1, column=0, sticky="nsew", padx=8, pady=(0, 8))
-        self.cart_scroll.grid_columnconfigure(0, weight=1)
 
         # Columna derecha — total y cobro
         right = ctk.CTkFrame(body, fg_color="transparent", corner_radius=0)
@@ -132,7 +131,7 @@ class PosFrame(BaseFrame):
             height=40,
         )
         self.recibido_entry.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 14))
-        self.recibido_entry.bind("<KeyRelease>", self._calc_cambio)
+        self.recibido_entry.bind("<KeyRelease>", self._calculate_change)
 
         # Cambio
         cambio_card = self.make_card(right)
@@ -167,7 +166,7 @@ class PosFrame(BaseFrame):
             height=36,
         ).grid(row=4, column=0, sticky="ew")
 
-    def _on_scan(self, produc: Product):
+    def _on_scan(self, product: Product):
         amount = self.amount_entry.get().strip()
 
         if not amount:
@@ -190,15 +189,34 @@ class PosFrame(BaseFrame):
             self.message.pack()
             return
         
+        new_item = (product, amount)
+
         self.message_box.place_forget()
         self.suggestions_box.place_forget()
 
-        # TODO: buscar producto en models y agregar al carrito
+        self.cart.append((product, amount))
+
+        total = product.price*amount
+        cart_item_text = f"Producto: {product.name}     Cantidad: {amount}     Total: {total}"
+        item_frame = ctk.CTkFrame(self.cart_scroll, 
+                                  fg_color="transparent", 
+                                  border_color=self.COLORS["border"],
+                                  border_width=1,
+                                  )
+        item_frame.pack(fill="x", pady=5)
+        self.item_label = ctk.CTkLabel(item_frame,
+                                       text=cart_item_text,
+                                       font=ctk.CTkFont(size=14),
+                                       text_color=self.COLORS["text_secondary"],
+                                       )
+        self.item_label.pack(fill='x', pady=2, padx=5)
+        self.item_label.bind("<Button-3>", lambda event, amount=amount, frame=item_frame: self._context_menu(event, new_item, frame))
+
 
         self.amount_entry.delete(0, "end")
         self.scan_entry.delete(0, "end")
 
-    def _calc_cambio(self, event=None):
+    def _calculate_change(self, event=None):
         try:
             recibido = float(self.recibido_entry.get().replace("$", "").replace(".", "").replace(",", "."))
             total = float(self.total_label.cget("text").replace("$", "").replace(".", "").replace(",", "."))
@@ -245,7 +263,19 @@ class PosFrame(BaseFrame):
                                                     )
             self.suggestion_button.grid(row=i, column=0, sticky="ew")
 
-            
+    def _context_menu(self, event, item: tuple, frame):
+        menu = tk.Menu(self, tearoff=0)
+        menu.add_command(label="Eliminar", command=lambda item=item, frame=frame: self._delete_item(item, frame))
+
+        try:
+            menu.post(event.x_root, event.y_root)
+            self.winfo_toplevel().bind("<Button>", lambda e: menu.unpost())
+        finally:
+            menu.grab_release() # make sure the frame quit even though the app fail
+
+    def _delete_item(self, item: tuple, frame):
+        self.cart.remove(item)
+        frame.destroy()
 
 
     def _confirmar_venta(self):
