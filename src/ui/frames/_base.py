@@ -45,8 +45,8 @@ class BaseFrame(ctk.CTkFrame):
         self.subtitle_label.grid(row=1, column=0, sticky="w")
 
     def set_header(self, title: str, subtitle: str = ""):
-        self.title_label.configure(text=title)
-        self.subtitle_label.configure(text=subtitle)
+        self.title_label.configure(text=title, font=ctk.CTkFont(size=28))
+        self.subtitle_label.configure(text=subtitle, font=ctk.CTkFont(size=20))
 
     def make_card(self, parent, **kwargs) -> ctk.CTkFrame:
         return ctk.CTkFrame(
@@ -62,7 +62,7 @@ class BaseFrame(ctk.CTkFrame):
         return ctk.CTkLabel(
             parent,
             text=text,
-            font=ctk.CTkFont(size=17),
+            font=ctk.CTkFont(size=18),
             text_color=self.COLORS[color_key],
             **kwargs,
         )
@@ -76,7 +76,7 @@ class BaseFrame(ctk.CTkFrame):
             hover_color=self.COLORS["accent_hover"] if accent else self.COLORS["card_hover"],
             text_color=self.COLORS["text_primary"],
             corner_radius=8,
-            font=ctk.CTkFont(size=15),
+            font=ctk.CTkFont(size=16),
             cursor="hand2",
             **kwargs,
         )
@@ -90,7 +90,7 @@ class BaseFrame(ctk.CTkFrame):
             text_color=self.COLORS["text_primary"],
             placeholder_text_color=self.COLORS["text_secondary"],
             corner_radius=8,
-            font=ctk.CTkFont(size=15),
+            font=ctk.CTkFont(size=16),
             **kwargs,
         )
 

@@ -17,7 +17,8 @@ COLORS = {
     "highlight":      "#7C3AED",  # near to purple to contrast
     "highlight_soft": "#926AD8",  # too light purple
     "login":          "#E8E8E8",  # white based on the image
-    "suggest_hover":  "#B0DFCA"   # light aqua
+    "suggest_hover":  "#B0DFCA",  # light aqua
+    "payments_menu":  "#74BE87",  # pastel green
 }
 
 NAV_ITEMS = [
@@ -30,13 +31,13 @@ NAV_ITEMS = [
     ("🤝", "Préstamos",   "loans")
 ]
 
-PAYMENT_METHODS = {
-    ("", "Efectivo"),
-    ("", "Nequi"),
-    ("", "Bancolombia"),
-    ("", "Daviplata"),
-    ("", "Otros")
-}
+PAYMENT_METHODS = [
+    "​💵​ Efectivo",
+    "📱 Nequi",
+    "🏦 Bancolombia",
+    "💳 Daviplata",
+    "​💲 Otro"
+]
 
 
 VERSION = "v1.0.0"

@@ -12,6 +12,7 @@ class Crud:   # Create(in database module), Read, Update and Delete
     def _init_(self, id: int):
         self.id = id
 
+
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
         result = db.execute_query(f"SELECT * FROM {cls.MAIN_TABLE} WHERE {parameter} = ?", (value, ))
@@ -143,10 +144,6 @@ class Sale(Crud):
         db.execute_query("UPDATE sale_details SET quantity = ? WHERE sale_id = ? AND product_id = ?", 
                                         (quantity, self.id, product_id))
         self.total_price += price * quantity
-
-    # apart to let the work to the UI to avoid unnecessary errors
-    def close_sale(self):
-        self.total_price = self.total_price * self.discount
 
 class Employee(Crud):
     MAIN_TABLE = 'employees'

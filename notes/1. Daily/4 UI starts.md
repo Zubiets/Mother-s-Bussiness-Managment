@@ -16,15 +16,13 @@ date until: 06/15/2026
 
 - [x] Learn about CTK in [[Custom TKinter]].
 
-
 - [x] Have the app base with a good structure, color and design
 
 - [x] Over the login window
 
-- [ ] Make the first frame: POS
+- [x] Make the first frame: POS
 
-  
-
+- I put some new modifications to models during the process of the UI construction.
 - The [[Database structure]] will use the library SQLite3. See the [[SQLite3]] for more information
 
   
@@ -42,6 +40,15 @@ Solution: The build method created all at the same time, the problem is when the
 
 - The windows is put in the screen corner
 Solution: using [[screen info]] we can get the PC dimensions, and with these, calculate the position where the windows will be in the center
+
+- When was tried to search for a product to sale the app make the process slow.
+solution: limit the inquiry results.
+
+- Some of the right side cards didn't show in the screen.
+solution: One could've been to change the POS frame to a scrobbable frame, but for the sake of my mother sight, I decide to mix some entries.
+
+- Decide how to respond the users errors was too tricky.
+Solution: For the search errors I decided to add a frame with place for make it like a floating frame, the payment errors only the entry border that the erros was made will chage its color to red.
   
 ## 💡 learned
 
@@ -57,10 +64,10 @@ Solution: using [[screen info]] we can get the PC dimensions, and with these, ca
 
 - how to make test files using pytest library, [[Pytest]], take on count something like a decorator to erase all the changes made by the test (TO DO).
 
-  
+- create interactive and consistent design with CTk where although I had a lot of problems, I consider is one of the easiest UI frameworks.
+
+- The context menu, a tool present in all the apps that we've ever used.
 
 ## ➡️ Tomorrow
 
-  
-
-Create and have ready the models and their methods for data manage
+make the inventory frame and the home base frame (even if all going good, make it all without charts until the moment)
