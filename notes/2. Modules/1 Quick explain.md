@@ -1,0 +1,1 @@
+This folder will be the explanation by app specific functionality, not for directory explanation. You can take it like project interrelated key points.
