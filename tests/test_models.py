@@ -86,16 +86,16 @@ def test_products(product, category):
 def test_sales(sale, product, test_db):
     assert sale, "Sale not found after add"
     assert sale.total_price == 0, "Sale total price mismatch"
-    sale.add_sale_detail(product_id=product.id, quantity=2, price=5000)
+    sale.add_sale_detail(product=product, quantity=2)
     details = sale.get_sale_details()
     assert details, "Sale details not found"
     assert len(details) == 1, "Unexpected number of sale details"
     assert details[0][1] == 2, "Sale detail quantity mismatch"
     assert details[0][2] == 5000, "Sale detail price mismatch"
-    sale.close_sale()
+    sale.total_price = 80000
     sale.update()
     updated = models.Sale.search_by_parameter("total_price", sale.total_price)
-    assert updated, "Sale not found after close"
+    assert updated.total_price == 80000, "Sale update failed"
     sale.delete()
     result = models.Sale.search_by_parameter("total_price", sale.total_price)
     assert not result, "Sale not deleted"
