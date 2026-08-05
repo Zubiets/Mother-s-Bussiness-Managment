@@ -14,7 +14,6 @@ class PosFrame(BaseFrame):
         self.cart: list[tuple] = []
 
     def _build_ui(self):
-
         body = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         body.grid(row=1, column=0, sticky="nsew", padx=24, pady=16)
         body.grid_columnconfigure(0, weight=5)
@@ -261,10 +260,7 @@ class PosFrame(BaseFrame):
         amount = self.amount_entry.get().strip()
 
         if not amount:
-            self.message_box.place(x=520, y=185)
-            self.message.configure(text = "Debe especificar la cantidad del producto")
-            self.message.pack()
-            return
+            amount = "0"
         
         try:
             amount = int(amount)
@@ -274,12 +270,25 @@ class PosFrame(BaseFrame):
             self.message.pack()
             return
 
-        if amount <= 0:
+        if amount < 0:
             self.message_box.place(x=520, y=185)
-            self.message.configure(text = "El valor del monto debe ser mayor a 0")
+            self.message.configure(text = "Solo escribir números mayores a 0")
             self.message.pack()
             return
-        
+
+        if amount == 0:
+            self.message_box.place(x=520, y=185)
+            self.message.configure(text = "Acaba de registrar un producto sin monto especifico", text_color=self.COLORS["success"])
+            self.message.pack()
+
+        if product.amount < amount:
+            self.message_box.place(x=420, y=185)
+            self.message.configure(text = """La cantidad del producto es menor a la ingresada
+            dejar vacio el campo para no registrar cantidad""")
+            self.message.pack()
+            return
+
+
         new_item = (product, amount)
 
         self.message_box.place_forget()
@@ -287,6 +296,9 @@ class PosFrame(BaseFrame):
         self.cart.append(new_item)
 
         item_total = product.price*amount
+        if item_total == 0:
+            item_total += product.price
+
         current_total = float(self.total_label.cget("text").replace("$", ""))
 
         self.total_label.configure(text=f"${(current_total+item_total)}")
@@ -354,12 +366,15 @@ class PosFrame(BaseFrame):
 
     def _confirm_sale(self):
         try:
+            discount = self.discount_entry.get().strip()
+            if not discount:
+                discount = 0
             sale = Sale(0, 
                 datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"), 
                 total_price=float(self.total_label.cget("text").replace("$", "")),
                 payment=float(self.payment_entry.get().strip()),
                 method=self.method.get().split(" ", 1)[1],
-                discount=int(self.discount_entry.get().strip())
+                discount=int(discount)
             )
             sale.add()
             sale = Sale.search_by_parameter("datetime", sale.datetime)
@@ -367,13 +382,14 @@ class PosFrame(BaseFrame):
             for item in self.cart:
                 sale.add_sale_detail(*item)
 
+                
+
             self._reset_frame()
             tk.messagebox.showinfo("Finalizar compra", "La compra ha sido exitosamente registrada", parent=self)
 
 
 
-        except ValueError as e:
-            print(e)
+        except ValueError:
             tk.messagebox.showerror("Finalizar compra", "Hay un error con los datos ingresados\n Verificar lugares en rojo", parent=self)
 
     def _reset_frame(self):

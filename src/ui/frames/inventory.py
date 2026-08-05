@@ -8,10 +8,12 @@ class InventoryFrame(BaseFrame):
         self.set_header("Inventario", "Administra productos y categorías")
 
     def _build_ui(self):
-        placeholder = self.make_label(
-            self,
-            text="Módulo en construcción...",
-            size=14,
-            color_key="text_secondary",
+        body = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        body.grid(row=1, column=0, sticky="nsew", padx=24, pady=16)
+        body.grid_columnconfigure(0, weight=1)
+        body.grid_rowconfigure(0, weight=1)
+        body.grid_rowconfigure(1, weight=9)
+
+        sections = ctk.CTkTabview(body, 
+            
         )
-        placeholder.grid(row=1, column=0)
