@@ -19,7 +19,7 @@ class BaseFrame(ctk.CTkFrame):
     def _build_header(self):
         self.header = ctk.CTkFrame(
             self,
-            fg_color=self.COLORS["bg"],
+            fg_color="transparent",
             corner_radius=0,
             height=60,
         )

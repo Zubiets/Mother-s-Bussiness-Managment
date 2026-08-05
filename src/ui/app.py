@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from .frames import pos, inventory, suppliers, employees, expenses, reports, loans, home
+from .frames import pos, inventory, suppliers, employees, expenses, reports, loans, home, tasks
 from config import COLORS, NAV_ITEMS, VERSION
 
 
@@ -88,7 +88,7 @@ class MainWindow(ctk.CTk):
             font=ctk.CTkFont(size=12),
             text_color=COLORS["border"],
         )
-        version.grid(row=9, column=0, pady=(0, 25), padx=25, sticky="ws")
+        version.grid(row=len(NAV_ITEMS)+2, column=0, pady=(0, 25), padx=25, sticky="ws")
     
     def build_frames(self):
             self.frames = {
@@ -100,6 +100,7 @@ class MainWindow(ctk.CTk):
             "expenses":  expenses.ExpensesFrame(self.content, COLORS),
             "reports":   reports.ReportsFrame(self.content, COLORS),
             "loans":     loans.LoansFrame(self.content, COLORS),
+            "tasks":     tasks.TasksFrame(self.content, COLORS)
             }
 
     def _navigate(self, key: str):

@@ -10,7 +10,7 @@ COLORS = {
     "accent_text":    "#6150A2",  # texto sobre acento
     "success":        "#2D7A5A",  # green
     "fail":           "#FF0000",  # red
-    "text_primary":   "#1A3A30",  # dark green
+    "text_primary":   "#0F1D18",  # dark green
     "text_secondary": "#6699AA",  # light blue
     "border":         "#A69F9F",  # bordes suaves
     "sidebar_text":   "#6655AA",  # texto sidebar inactivo
@@ -28,7 +28,8 @@ NAV_ITEMS = [
     ("👥", "Empleados",   "employees"),
     ("💸", "Gastos",      "expenses"),
     ("📊", "Reportes",    "reports"),
-    ("🤝", "Préstamos",   "loans")
+    ("🤝", "Préstamos",   "loans"),
+    ("💲", "Pendientes",  "tasks")
 ]
 
 PAYMENT_METHODS = [
@@ -39,5 +40,14 @@ PAYMENT_METHODS = [
     "​💲 Otro"
 ]
 
+INVENTORY_SECTIONS = {
+    ("#F3AC8B", "Productos", "products"),     # light orange
+    ("#F8ACDF", "Categorias", "categories"),  # light pink
+    ("#C9E8EC", "Ventas", "sales"),           # light aqua
+    ("#A493F3", "Empleados", "employees"),    # light blue
+    ("#F1F79C", "Proveedores", "suppliers"),  # light yellow
+    ("#E78C8C", "Gastos", "Expenses"),        # light red
+    ("#B8F7AC", "Prestamos", "Loans")         # light green
+}
 
 VERSION = "v1.0.0"

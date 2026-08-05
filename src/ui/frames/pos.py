@@ -78,7 +78,6 @@ class PosFrame(BaseFrame):
         cart_card = self.make_card(left)
         cart_card.grid(row=1, column=0, sticky="nsew")
         cart_card.grid_columnconfigure(0, weight=1)
-
         cart_card.grid_rowconfigure(1, weight=1)
 
         self.make_label(

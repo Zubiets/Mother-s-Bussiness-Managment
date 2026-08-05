@@ -86,7 +86,7 @@ def test_products(product, category):
 def test_sales(sale, product, test_db):
     assert sale, "Sale not found after add"
     assert sale.total_price == 0, "Sale total price mismatch"
-    sale.add_sale_detail(product=product, quantity=2)
+    sale.add_sale_detail(product=product, amount=2)
     details = sale.get_sale_details()
     assert details, "Sale details not found"
     assert len(details) == 1, "Unexpected number of sale details"
