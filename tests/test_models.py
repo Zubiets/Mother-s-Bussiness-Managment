@@ -19,7 +19,7 @@ def supplier(test_db):
 
 @pytest.fixture
 def category(supplier):
-    c = models.Category(id=None, name="Test Category", supplier_id=supplier.id, description="Test description")
+    c = models.Category(id=None, name="Test Category", supplier_id=supplier.id)
     assert c.add() != False, "There's a unique contrait fail"
     return models.Category.search_by_parameter("name", "Test Category")
 @pytest.fixture
@@ -56,10 +56,7 @@ def test_categories(category, supplier):
     assert category, "Category not found after add"
     assert category.name == "Test Category", "Category name mismatch"
     assert category.suppliers_id == supplier.id, "Category supplier mismatch"
-    category.description = "Updated description"
     category.update()
-    updated = models.Category.search_by_parameter("name", "Test Category")
-    assert updated.description == "Updated description", "Category update failed"
     category.delete()
     result = models.Category.search_by_parameter("name", "Test Category")
     assert not result, "Category not deleted"
@@ -236,7 +233,7 @@ def test_suggestion_search(test_db):
     supplier = models.Supplier(id=None, name="Test Supplier", contact_info="123456789")
     supplier.add()
     supplier = models.Supplier.search_by_parameter("name", "Test Supplier")
-    category = models.Category(id=None, name="Test Category", supplier_id=supplier.id, description="Test")
+    category = models.Category(id=None, name="Test Category", supplier_id=supplier.id)
     category.add()
     category = models.Category.search_by_parameter("name", "Test Category")
     

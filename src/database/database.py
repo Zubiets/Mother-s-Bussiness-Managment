@@ -50,8 +50,12 @@ class Database:
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
 
-    def fetch_table(self, table_name: str):
-        return self.execute_query(f"SELECT * FROM {table_name}")
+    def fetch_table(self, table_name: str):    
+        cursor = self.connection.cursor()
+        cursor.execute(f"SELECT * FROM {table_name}")
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
 
 
         
@@ -64,7 +68,6 @@ def create_tables(db):
         'name': 'TEXT NOT NULL',
         'suppliers_id': 'INTEGER NOT NULL',
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
-        'description': 'TEXT',
         'FOREIGN KEY(suppliers_id)': 'REFERENCES suppliers(id)'
     })
 

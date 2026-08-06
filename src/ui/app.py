@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from .frames import pos, inventory, suppliers, employees, expenses, reports, loans, home, tasks
+from .frames import pos, inventory, employees, expenses, reports, loans, home, tasks
 from config import COLORS, NAV_ITEMS, VERSION
 
 
@@ -95,7 +95,6 @@ class MainWindow(ctk.CTk):
             "home":      home.HomeFrame(self.content, COLORS),
             "pos":       pos.PosFrame(self.content, COLORS),
             "inventory": inventory.InventoryFrame(self.content, COLORS),
-            "suppliers": suppliers.SuppliersFrame(self.content, COLORS),
             "employees": employees.EmployeesFrame(self.content, COLORS),
             "expenses":  expenses.ExpensesFrame(self.content, COLORS),
             "reports":   reports.ReportsFrame(self.content, COLORS),

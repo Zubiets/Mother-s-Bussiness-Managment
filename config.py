@@ -24,7 +24,6 @@ COLORS = {
 NAV_ITEMS = [
     ("🛍", "Caja",        "pos"),
     ("📦", "Inventario",  "inventory"),
-    ("🚚", "Proveedores", "suppliers"),
     ("👥", "Empleados",   "employees"),
     ("💸", "Gastos",      "expenses"),
     ("📊", "Reportes",    "reports"),
@@ -39,15 +38,5 @@ PAYMENT_METHODS = [
     "💳 Daviplata",
     "​💲 Otro"
 ]
-
-INVENTORY_SECTIONS = {
-    ("#F3AC8B", "Productos", "products"),     # light orange
-    ("#F8ACDF", "Categorias", "categories"),  # light pink
-    ("#C9E8EC", "Ventas", "sales"),           # light aqua
-    ("#A493F3", "Empleados", "employees"),    # light blue
-    ("#F1F79C", "Proveedores", "suppliers"),  # light yellow
-    ("#E78C8C", "Gastos", "Expenses"),        # light red
-    ("#B8F7AC", "Prestamos", "Loans")         # light green
-}
 
 VERSION = "v1.0.0"

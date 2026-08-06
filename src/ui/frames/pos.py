@@ -6,7 +6,6 @@ from src.database.models import Sale, Product
 import datetime
 
 
-
 class PosFrame(BaseFrame):
     def __init__(self, parent, colors):
         super().__init__(parent, colors)
@@ -276,9 +275,7 @@ class PosFrame(BaseFrame):
             return
 
         if amount == 0:
-            self.message_box.place(x=520, y=185)
-            self.message.configure(text = "Acaba de registrar un producto sin monto especifico", text_color=self.COLORS["success"])
-            self.message.pack()
+            hide_amount = int(tk.simpledialog.askinteger("Confirmar cantidad", "Ingresar cantidad real del producto (No se restara la cantidad total en el local)"))
 
         if product.amount < amount:
             self.message_box.place(x=420, y=185)
@@ -296,7 +293,7 @@ class PosFrame(BaseFrame):
 
         item_total = product.price*amount
         if item_total == 0:
-            item_total += product.price
+            item_total = product.price*hide_amount
 
         current_total = float(self.total_label.cget("text").replace("$", ""))
 

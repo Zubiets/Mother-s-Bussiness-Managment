@@ -7,7 +7,7 @@ from src.database import database, models
 load_dotenv()
 
 
-def main():
+def main(db):
     print("Welcome to the Inventory Management System!")
     login = app.MainWindow()
     login.mainloop()
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         if not db.fetch_table("users"):
             default = models.User(os.getenv("MAIN_USER"), os.getenv("PASSWORD"))
             default.set_user()
-        main()
+        main(db)
     finally:
         db.disconnect() # Disconnect from the database although will be errors
         print("Goodbye!") 

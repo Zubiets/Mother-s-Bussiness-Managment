@@ -6,6 +6,10 @@ import calendar
 
 
 db: database.Database = None
+
+def fetch_table(table_name):
+    return db.fetch_table(table_name)
+
 class Crud:   # Create(in database module), Read, Update and Delete
     MAIN_TABLE: str = None # table name
 
@@ -104,12 +108,11 @@ class Product(Crud_two_tables):
 class Category(Crud_two_tables):
     MAIN_TABLE = 'categories'
     SECONDARY_TABLE = 'suppliers'
-    def __init__(self, id: int, name: str, supplier_id: int, state: str = "ACTIVE", description = "", supplier = ""):
+    def __init__(self, id: int, name: str, supplier_id: int, state: str = "ACTIVE", supplier = ""):
         super()._init_(id)
         self.name = name 
         self.suppliers_id = supplier_id
         self.state = state
-        self.description = description
         self.supplier = supplier
 
 class Supplier(Crud):
