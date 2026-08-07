@@ -1,7 +1,9 @@
 import tkinter as tk
+from tkinter.tix import ROW
 import customtkinter as ctk
 from ._base import BaseFrame
-from src.database.models import fetch_table
+from src.database.models import Employee, Product, Sale, Category, Supplier, Loan, Expense
+
 
 class InventoryFrame(BaseFrame):
     def __init__(self, parent, colors):
@@ -22,7 +24,7 @@ class InventoryFrame(BaseFrame):
         sections = ctk.CTkFrame(body, fg_color="transparent")
         sections.grid(column=0, row=0)
 
-        for (color, name, table, headers) in self.INVENTORY_SECTIONS:
+        for (color, name, clss, headers) in self.INVENTORY_SECTIONS:
             ctk.CTkButton(sections,
                 height=40, 
                 cursor="hand2",
@@ -32,7 +34,7 @@ class InventoryFrame(BaseFrame):
                 font=ctk.CTkFont(size=18),
                 fg_color=color,
                 corner_radius=15,
-                command=lambda color=color, table=table, headers=headers: self._section_constr(color, table, headers)
+                command=lambda color=color, clss=clss, headers=headers: self._section_constr(color, clss, headers)
             ).pack(side="right", padx=2)
 
         view = ctk.CTkFrame(body, fg_color="transparent", corner_radius=0)
@@ -53,8 +55,8 @@ class InventoryFrame(BaseFrame):
         search_space.grid_columnconfigure(1, weight=5)
         search_space.grid_rowconfigure(0, weight=1)
 
-        self.parameter = ctk.StringVar()
-        ctk.CTkOptionMenu(search_space,
+        self.parameter = ctk.StringVar(value="Seleccionar parametro de búsqueda")
+        self.parameters_menu = ctk.CTkOptionMenu(search_space,
             variable=self.parameter,
             values=[],
             fg_color=self.COLORS["bg"],
@@ -68,7 +70,8 @@ class InventoryFrame(BaseFrame):
             font=ctk.CTkFont(size=16),
             dropdown_font=ctk.CTkFont(size=15),
             cursor="hand2",
-        ).grid(row=0, column=0, sticky="ew", padx=12)
+        )
+        self.parameters_menu.grid(row=0, column=0, sticky="ew", padx=12)
 
         self.search_entry = self.make_entry(search_space, "Busqueda por nombre de producto")
         self.search_entry.configure(border_color=self.COLORS["bg"])
@@ -80,28 +83,30 @@ class InventoryFrame(BaseFrame):
 
     def _build_sections(self):
         self.INVENTORY_SECTIONS = {
-            ("#F3AC8B", "Productos", "products", ("ID", "Nombre", "ID categoria", "Precio", "Cantidad", "Estado", "Código QR")),     # light orange
-            ("#F8ACDF", "Categorias", "categories", ("id", "Nombre", "id proveedor", "estado")),                                     # light pink
-            ("#C9E8EC", "Ventas", "sales", ("ID", "Fecha", "Precio total", "Total pagado", "Metodo de pago", "Descuento en %")),     # light aqua
-            ("#A493F3", "Empleados", "employees", ("ID", "Nombre", "salario", "Info de contacto", "Estado")),                        # light blue
-            ("#F1F79C", "Proveedores", "suppliers", ("ID", "Nombre", "Info de contacto", "Estado")),                                 # light yellow
-            ("#E78C8C", "Gastos", "Expenses", ("ID", "Nombre", "ID categoria", "Gasto total", "Metodo pago", "Fecha", "código QR")), # light red
-            ("#B8F7AC", "Prestamos", "Loans", ("ID", "ID proveedor", "Cantidad", "Fecha", "Cuotas", "Estado"))         # light green
+            ("#F3AC8B", "Productos", Product, ("Nombre", "Precio", "Cantidad", "Estado", "Código QR", "nombre_categoria")),     # light orange
+            ("#F8ACDF", "Categorias", Category, ("Nombre", "estado", "Nombre del principal distribuidor")),                                     # light pink
+            ("#C9E8EC", "Ventas", Sale, ("Fecha", "Precio total", "Total pagado", "Metodo de pago", "Descuento en %")),     # light aqua
+            ("#A493F3", "Empleados", Employee, ("Nombre", "salario", "Info de contacto", "Estado")),                        # light blue
+            ("#F1F79C", "Proveedores", Supplier, ("Nombre", "Info de contacto", "Estado")),                                 # light yellow
+            ("#E78C8C", "Gastos", Expense, ("Nombre", "Gasto total", "Metodo pago", "Fecha", "código QR", "Nombre de la categoria")), # light red
+            ("#B8F7AC", "Prestamos", Loan, ("Cantidad", "Fecha", "Cuotas", "Estado", "Nombre del prestador"))         # light green
         }
 
-    def _section_constr(self, color, table, headers):
+    def _section_constr(self, color, clss, headers):
         if self.items_tree:
             self.items_tree.destroy()
 
         self.configure(fg_color=color)
-        table_result = fetch_table(table)
-        self.items_tree = tk.ttk.Treeview(self.items_scrobable, columns=list(table_result[0].keys()), show="headings")
+        self.parameters_menu.configure(values=headers)
+        table_data = clss.fetch_table()
+        self.items_tree = tk.ttk.Treeview(self.items_scrobable, columns=headers, show="headings")
         self.items_tree.pack()
 
         for i, header in enumerate(headers):
-            self.items_tree.heading(list(table_result[0].keys())[i], text=header)
+            self.items_tree.heading(header, text=header)
 
-
+        for row in table_data:
+            self.items_tree.insert("", tk.END, values=row)
     
     def _search_product(self, event=None):
         pass

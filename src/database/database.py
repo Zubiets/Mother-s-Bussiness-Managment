@@ -1,4 +1,5 @@
 import sqlite3
+from typing import List
 
 # model to manipulate easier the database 
 class Database:
@@ -50,9 +51,23 @@ class Database:
         query = f"UPDATE {table_name} SET {set_str} WHERE id = ?"
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
 
-    def fetch_table(self, table_name: str):    
+    def fetch_table(self, table_name: str, secondary: str = None, columns: List = None):    
         cursor = self.connection.cursor()
-        cursor.execute(f"SELECT * FROM {table_name}")
+
+        if not columns:
+            return cursor.execute(f"SELECT * FROM {table_name}")
+
+        if not secondary:
+            columns = ", ".join(columns)
+            cursor.execute(f"SELECT {columns} FROM {table_name}")
+        else:
+            for i, column in enumerate(columns[:-1]):
+                columns[i] = f"{table_name}.".join(column)
+            columns[-1] = f"{secondary}.name"
+            columns = ", ".join(columns)
+
+            cursor.execute(f"""SELECT {columns} FROM {table_name}
+                                JOIN {secondary} ON {table_name}.{secondary}_id = {secondary}.id""")
         columns = [col[0] for col in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
         
@@ -65,8 +80,8 @@ class Database:
 def create_tables(db):
     db.create_table('categories', {  # different important parts from the local
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'name': 'TEXT NOT NULL',
         'suppliers_id': 'INTEGER NOT NULL',
+        'name': 'TEXT NOT NULL',
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
         'FOREIGN KEY(suppliers_id)': 'REFERENCES suppliers(id)'
     })
@@ -80,8 +95,8 @@ def create_tables(db):
 
     db.create_table('products', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'name': 'TEXT NOT NULL',
         'categories_id': 'INTEGER NOT NULL',
+        'name': 'TEXT NOT NULL',
         'price': 'REAL NOT NULL',
         "amount": "INTEGER NOT NULL DEFAULT 1",   # if the product is active, there's at least one sample
         'state': "TEXT NOT NULL DEFAULT 'ACTIVE'",
@@ -135,8 +150,8 @@ def create_tables(db):
 
     db.create_table('expenses', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        'name': 'TEXT NOT NULL',
         'categories_id': 'INTEGER NOT NULL',
+        'name': 'TEXT NOT NULL',
         'amount': 'REAL NOT NULL',
         "payment_method": "REAL NOT NULL DEFAULT 'Efectivo'",
         'datetime': 'DATE NOT NULL',

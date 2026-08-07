@@ -16,6 +16,9 @@ class Crud:   # Create(in database module), Read, Update and Delete
     def _init_(self, id: int):
         self.id = id
 
+    @classmethod
+    def fetch_table(cls):
+        return db.fetch_table(cls.MAIN_TABLE, columns=list(vars(cls(None, None, None, None, None)).keys())[1:])
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
@@ -52,6 +55,10 @@ class Crud_two_tables:
 
     def _init_(self, id: int):
         self.id = id # important to the delete function works
+
+    @classmethod
+    def fetch_table(cls):
+        return db.fetch_table(cls.MAIN_TABLE, cls.SECONDARY_TABLE, list(vars(cls(None, None, None, None, None)).keys())[2:])
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value): # flexible function to read a get query
@@ -95,8 +102,8 @@ class Product(Crud_two_tables):
     SECONDARY_TABLE = 'categories'
     def __init__(self, id: int, name: str, category_id: int, price: int, amount: int = 1, state = "ACTIVE", qr_code: str = "", category = ""):
         super()._init_(id)
-        self.name = name
         self.categories_id = category_id
+        self.name = name
         self.price = price
         self.amount = amount
         self.state = state
@@ -108,10 +115,10 @@ class Product(Crud_two_tables):
 class Category(Crud_two_tables):
     MAIN_TABLE = 'categories'
     SECONDARY_TABLE = 'suppliers'
-    def __init__(self, id: int, name: str, supplier_id: int, state: str = "ACTIVE", supplier = ""):
+    def __init__(self, id: int, supplier_id: int, name: str, state: str = "ACTIVE", supplier: str = ""):
         super()._init_(id)
-        self.name = name 
         self.suppliers_id = supplier_id
+        self.name = name 
         self.state = state
         self.supplier = supplier
 
@@ -197,10 +204,10 @@ class Work_day(Crud_two_tables):
 class Expense(Crud_two_tables):
     MAIN_TABLE = 'expenses'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id, amount: float, method: str, datetime: str, category: str = ""):
+    def __init__(self, id: int, category_id, name: str, amount: float, method: str, datetime: str = "", category: str = ""):
         super()._init_(id)
-        self.name = name
         self.categories_id = category_id
+        self.name = name
         self.amount = amount
         self.payment_method = method
         self.datetime = datetime
@@ -223,11 +230,11 @@ class Loan(Crud_two_tables):
 
     def determine_payments_dates(self, time_intervals: str):
         loan_date = datetime.datetime.strptime(self.date, "%Y/%m/%d")
-        for i in range(self.installments):
+        for i in range(1, self.installments):
             if time_intervals == "SEMANAL": # in spanish to make short some parts of the UI
                 payment_date = loan_date + datetime.timedelta(weeks=i)
             elif time_intervals == "QUINCENAL":
-                payment_date = loan_date + datetime.timedelta(days=15)
+                payment_date = loan_date + datetime.timedelta(days=15*i)
             elif time_intervals == "MENSUAL":
                 payment_date = dateutil.relativedelta.relativedelta(months=i) # is used the timeutil to make easier the calculate
                 payment_date = loan_date + payment_date
@@ -239,7 +246,7 @@ class Loan(Crud_two_tables):
 class Task(Crud):
     MAIN_TABLE = "tasks"
     def __init__(self, id: int, name: str, datetime: str, description: str, state = "PENDING", highlight = "DEACTIVATE"):
-        self.id = id
+        super()._init_(id)
         self.name = name
         self.datetime = datetime
         self.description = description

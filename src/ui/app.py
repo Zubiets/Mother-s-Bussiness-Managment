@@ -1,6 +1,10 @@
 import customtkinter as ctk
 from .frames import pos, inventory, employees, expenses, reports, loans, home, tasks
 from config import COLORS, NAV_ITEMS, VERSION
+from screeninfo import get_monitors
+
+VERTICAL_PIXELS = get_monitors()[0].height
+HORIZONTAL_PIXELS = get_monitors()[0].width
 
 
 class MainWindow(ctk.CTk):
@@ -8,7 +12,8 @@ class MainWindow(ctk.CTk):
         super().__init__()
 
         self.title("Mandala y Variedades")
-        self.geometry("1920x1080")
+        self.geometry(f"{HORIZONTAL_PIXELS}x{VERTICAL_PIXELS}")
+        self.minsize(1250, 600)
         self.configure(fg_color=COLORS["bg"])
 
         self._active = None

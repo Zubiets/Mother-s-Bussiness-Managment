@@ -15,3 +15,6 @@ run:
 
 seed:
 	python -m seed
+
+query:
+	sqlite3 data/inventory.db
