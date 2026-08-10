@@ -148,10 +148,10 @@ def create_tables(db):
     db.create_table('expenses', {
         'id': 'INTEGER PRIMARY KEY AUTOINCREMENT',
         'categories_id': 'INTEGER NOT NULL',
-        'name': 'TEXT NOT NULL',
+        'datetime': 'DATE NOT NULL',
         'amount': 'REAL NOT NULL',
         "payment_method": "REAL NOT NULL DEFAULT 'Efectivo'",
-        'datetime': 'DATE NOT NULL',
+        'description': "TEXT NOT NULL",
         'FOREIGN KEY(categories_id)': 'REFERENCES categories(id)'
     })
 

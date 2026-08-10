@@ -146,23 +146,23 @@ def test_expenses(category):
     expense = models.Expense(
         id=None,
         category_id=category.id,
-        name="Test Expense",
+        description="Test Expense",
         amount=50000,
         method="Efectivo",
         datetime=datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
     )
     expense.add()
-    result = models.Expense.search_by_parameter("name", "Test Expense")
+    result = models.Expense.search_by_parameter("datetime", expense.datetime)
     assert result, "Expense not found after add"
     assert result.amount == 50000, "Expense amount mismatch"
     assert result.categories_id == category.id, "Expense category mismatch"
     assert result.payment_method == "Efectivo", "Expense method mismatch"
     result.amount = 75000
     result.update()
-    updated = models.Expense.search_by_parameter("name", "Test Expense")
+    updated = models.Expense.search_by_parameter("datetime", expense.datetime)
     assert updated.amount == 75000, "Expense update failed"
     result.delete()
-    deleted = models.Expense.search_by_parameter("name", "Test Expense")
+    deleted = models.Expense.search_by_parameter("datetime", expense.datetime)
     assert not deleted, "Expense not deleted"
 
 def test_loans(supplier):

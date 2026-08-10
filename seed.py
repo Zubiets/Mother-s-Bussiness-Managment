@@ -7,7 +7,7 @@ def seed_database():
 
     # Suppliers
     suppliers = [
-        models.Supplier(id=None, name=f"Supplier {i}", contact_info=f"30012345{i:02d}")
+        models.Supplier(id=None, name=f"Supplier {i}", contact_info=f"30012345{i:02d}, llllllllll@gmail.com\n31000000{i:02d}")
         for i in range(1, 51)
     ]
     for s in suppliers:
@@ -75,7 +75,7 @@ def seed_database():
     expenses = [
         models.Expense(
             id=None,
-            name=f"Expense {i}",
+            description=f"Expense {i}",
             category_id=category_ids[i-1],
             amount=i*10000,
             method="Efectivo",

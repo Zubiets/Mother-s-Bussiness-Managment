@@ -207,13 +207,13 @@ class Work_day(Crud_two_tables):
 class Expense(Crud_two_tables):
     MAIN_TABLE = 'expenses'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, category_id, name: str, amount: float, method: str, datetime: str = "", category: str = ""):
+    def __init__(self, id: int, category_id, datetime: str, amount: float, method: str, description: str, category: str = ""):
         super()._init_(id)
         self.categories_id = category_id
-        self.name = name
+        self.datetime = datetime
         self.amount = amount
         self.payment_method = method
-        self.datetime = datetime
+        self.description = description
         self.category = category
     
 class Loan(Crud_two_tables):

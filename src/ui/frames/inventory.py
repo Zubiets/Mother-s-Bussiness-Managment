@@ -94,7 +94,7 @@ class InventoryFrame(BaseFrame):
             ("#C9E8EC", "Ventas", Sale, ("Fecha", "Precio total", "Total pagado", "Metodo de pago", "Descuento en %")),     # light aqua
             ("#A493F3", "Empleados", Employee, ("Nombre", "salario", "Info de contacto", "Estado")),                        # light blue
             ("#F1F79C", "Proveedores", Supplier, ("Nombre/s", "Info de contacto", "Estado")),                                 # light yellow
-            ("#E78C8C", "Gastos", Expense, ("Nombre", "Gasto total", "Metodo pago", "Fecha", "Nombre de la categoria")), # light red
+            ("#E78C8C", "Gastos", Expense, ("Fecha", "Gasto total", "Metodo pago", "Descripcion", "Nombre de la categoria")), # light red
             ("#B8F7AC", "Prestamos", Loan, ("Cantidad", "Fecha", "Cuotas", "Estado", "Nombre del prestador"))         # light green
         }
 
@@ -116,6 +116,8 @@ class InventoryFrame(BaseFrame):
         self.x_scroll.pack(side="bottom", fill="x")
 
         # Treeview
+        tk.ttk.Style().configure("Treeview", font=ctk.CTkFont(size=14))
+        tk.ttk.Style().configure("Treeview.Heading", font=ctk.CTkFont(size=16))
         self.items_tree = tk.ttk.Treeview(
             self.view_frame,
             columns=headers,
