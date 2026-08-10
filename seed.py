@@ -8,15 +8,15 @@ def seed_database():
     # Suppliers
     suppliers = [
         models.Supplier(id=None, name=f"Supplier {i}", contact_info=f"30012345{i:02d}")
-        for i in range(1, 11)
+        for i in range(1, 51)
     ]
     for s in suppliers:
         s.add()
-    supplier_ids = [models.Supplier.search_by_parameter("name", f"Supplier {i}").id for i in range(1, 11)]
+    supplier_ids = [models.Supplier.search_by_parameter("name", f"Supplier {i}").id for i in range(1, 51)]
 
     # Categories
     categories = [
-        models.Category(id=None, name=f"Category {i}", supplier_id=supplier_ids[i-1], description=f"Description {i}")
+        models.Category(id=None, name=f"Category {i}", supplier_id=supplier_ids[i-1])
         for i in range(1, 11)
     ]
     for c in categories:
@@ -25,12 +25,12 @@ def seed_database():
 
     # Products
     products = [
-        models.Product(id=None, name=f"Product {i}", category_id=category_ids[i-1], price=i*1000, qr_code=f"QR{i:04d}")
+        models.Product(id=None, name=f"Product {i}", category_id=category_ids[i-1], amount=i, price=i*1000, qr_code=f"QR{i:04d}")
         for i in range(1, 11)
     ]
     for p in products:
         p.add()
-    product_ids = [models.Product.search_by_parameter("qr_code", f"QR{i:04d}").id for i in range(1, 11)]
+    products = [models.Product.search_by_parameter("qr_code", f"QR{i:04d}") for i in range(1, 11)]
 
     # Sales + SaleDetails
     for i in range(1, 11):
@@ -42,7 +42,7 @@ def seed_database():
         )
         sale.add()
         sale.id = db.execute_query("SELECT last_insert_rowid()") [0][0]
-        sale.add_sale_detail(product_id=product_ids[i-1], quantity=i, price=i*1000)
+        sale.add_sale_detail(product=products[i-1], amount=i)
         sale.total_price = i * i * 1000
         sale.update()
 

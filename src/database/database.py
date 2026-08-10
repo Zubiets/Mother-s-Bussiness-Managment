@@ -52,24 +52,21 @@ class Database:
         self.execute_query(query, tuple(update_data.values()) + (item_id,))
 
     def fetch_table(self, table_name: str, secondary: str = None, columns: List = None):    
-        cursor = self.connection.cursor()
-
         if not columns:
-            return cursor.execute(f"SELECT * FROM {table_name}")
+            return self.execute_query(f"SELECT * FROM {table_name}")
 
-        if not secondary:
+        elif not secondary:
             columns = ", ".join(columns)
-            cursor.execute(f"SELECT {columns} FROM {table_name}")
+            return self.execute_query(f"SELECT {columns} FROM {table_name}")
+
         else:
-            for i, column in enumerate(columns[:-1]):
-                columns[i] = f"{table_name}.".join(column)
-            columns[-1] = f"{secondary}.name"
+            for i, column in enumerate(columns):
+                columns[i] = f"{table_name}.{column}"
+            columns.append(f"{secondary}.name")
             columns = ", ".join(columns)
-
-            cursor.execute(f"""SELECT {columns} FROM {table_name}
+            return self.execute_query(f"""SELECT {columns} FROM {table_name}
                                 JOIN {secondary} ON {table_name}.{secondary}_id = {secondary}.id""")
-        columns = [col[0] for col in cursor.description]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            
         
 
 

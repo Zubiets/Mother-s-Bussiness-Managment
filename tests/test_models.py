@@ -25,7 +25,7 @@ def category(supplier):
 
 @pytest.fixture
 def product(category):
-    p = models.Product(id=None, name="Test Product", category_id=category.id, price=5000, qr_code="TEST123")
+    p = models.Product(id=None, name="Test Product", category_id=category.id, amount=3, price=5000, qr_code="TEST123")
     p.add()
     return models.Product.search_by_parameter("name", "Test Product")
 
@@ -99,7 +99,7 @@ def test_sales(sale, product):
     assert details[0][1] == 2, "Sale detail quantity mismatch"
     assert details[0][2] == 5000, "Sale detail price mismatch"
     updated_product = models.Product.search_by_parameter("name", "Test Product")
-    assert updated_product.amount == product.amount - 2, "Product stock not reduced after sale"
+    assert updated_product.amount == 1, "Product stock not reduced after sale"
     sale.total_price = 80000
     sale.update()
     updated = models.Sale.search_by_parameter("total_price", 80000)
@@ -257,3 +257,23 @@ def test_suggestion_search(category):
     assert len(active_results) == 2, "Inactive products should be excluded"
     all_results = models.Product.search_by_parameter("state", "ACTIVE")
     assert isinstance(all_results, list), "Multiple results should return list"
+
+def test_fetchall(test_db):
+    s = models.Supplier(id=None, name="Fetch Test", contact_info="3001111111")
+    s.add()
+    result = test_db.fetch_table("suppliers")
+    assert result, "fetch_table returned no results"
+    assert len(result) >= 1, "Should have at least one row"
+
+    e2 = models.Supplier(id=None, name="Fetch test 2", contact_info="312221222")
+    e2.add()
+    result2 = models.Supplier.fetch_table()
+    assert result2, "fetch method has not result"
+    assert len(result2) == 2, "the table must have 2 rows"
+
+    c = models.Category(id=None, supplier_id=result2[1][0], name="Fetch test 3")
+    c.add()
+    result3 = models.Category.fetch_table()
+    assert result3, "categories fetch has no result"
+    assert len(result3) == 1, "The table must have one row"
+

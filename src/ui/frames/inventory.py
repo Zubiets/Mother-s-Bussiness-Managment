@@ -49,14 +49,14 @@ class InventoryFrame(BaseFrame):
         items_space.grid_rowconfigure(1, weight=9)
         items_space.grid_columnconfigure(0, weight=1)
 
-        search_space = ctk.CTkFrame(items_space, fg_color=self.COLORS["card"])
-        search_space.grid(column=0, row=0, sticky="ew", padx=12)
-        search_space.grid_columnconfigure(0, weight=1)
-        search_space.grid_columnconfigure(1, weight=5)
-        search_space.grid_rowconfigure(0, weight=1)
+        search_frame = ctk.CTkFrame(items_space, fg_color=self.COLORS["card"])
+        search_frame.grid(column=0, row=0, sticky="ew", padx=12)
+        search_frame.grid_columnconfigure(0, weight=1)
+        search_frame.grid_columnconfigure(1, weight=5)
+        search_frame.grid_rowconfigure(0, weight=1)
 
         self.parameter = ctk.StringVar(value="Seleccionar parametro de búsqueda")
-        self.parameters_menu = ctk.CTkOptionMenu(search_space,
+        self.parameters_menu = ctk.CTkOptionMenu(search_frame,
             variable=self.parameter,
             values=[],
             fg_color=self.COLORS["bg"],
@@ -73,22 +73,28 @@ class InventoryFrame(BaseFrame):
         )
         self.parameters_menu.grid(row=0, column=0, sticky="ew", padx=12)
 
-        self.search_entry = self.make_entry(search_space, "Busqueda por nombre de producto")
+        self.search_entry = self.make_entry(search_frame, "Busqueda por nombre de producto")
         self.search_entry.configure(border_color=self.COLORS["bg"])
         self.search_entry.grid(column=1, row=0, sticky="ew", padx=12)
         self.search_entry.bind("<Return>", self._search_product)
 
-        self.items_scrobable = ctk.CTkScrollableFrame(items_space, corner_radius=0, fg_color=self.COLORS["card"],)
-        self.items_scrobable.grid(column=0, row=1, sticky="nsew", padx=12, pady=(0, 12))
+        self.view_frame = ctk.CTkFrame(items_space, fg_color=self.COLORS["card"])
+        self.view_frame.grid(row=1, column=0, sticky="nsew", padx=12)
+        self.view_frame.grid_columnconfigure(0, weight=1)
+        self.view_frame.grid_columnconfigure(1, weight=10)
+        self.view_frame.grid_rowconfigure(0, weight=1)
+        self.view_frame.grid_rowconfigure(1, weight=0)
+
+
 
     def _build_sections(self):
         self.INVENTORY_SECTIONS = {
             ("#F3AC8B", "Productos", Product, ("Nombre", "Precio", "Cantidad", "Estado", "Código QR", "nombre_categoria")),     # light orange
-            ("#F8ACDF", "Categorias", Category, ("Nombre", "estado", "Nombre del principal distribuidor")),                                     # light pink
+            ("#F8ACDF", "Categorias", Category, ("Nombre", "estado", "Nombre proveedor/es")),                                     # light pink
             ("#C9E8EC", "Ventas", Sale, ("Fecha", "Precio total", "Total pagado", "Metodo de pago", "Descuento en %")),     # light aqua
             ("#A493F3", "Empleados", Employee, ("Nombre", "salario", "Info de contacto", "Estado")),                        # light blue
-            ("#F1F79C", "Proveedores", Supplier, ("Nombre", "Info de contacto", "Estado")),                                 # light yellow
-            ("#E78C8C", "Gastos", Expense, ("Nombre", "Gasto total", "Metodo pago", "Fecha", "código QR", "Nombre de la categoria")), # light red
+            ("#F1F79C", "Proveedores", Supplier, ("Nombre/s", "Info de contacto", "Estado")),                                 # light yellow
+            ("#E78C8C", "Gastos", Expense, ("Nombre", "Gasto total", "Metodo pago", "Fecha", "Nombre de la categoria")), # light red
             ("#B8F7AC", "Prestamos", Loan, ("Cantidad", "Fecha", "Cuotas", "Estado", "Nombre del prestador"))         # light green
         }
 
@@ -99,10 +105,29 @@ class InventoryFrame(BaseFrame):
         self.configure(fg_color=color)
         self.parameters_menu.configure(values=headers)
         table_data = clss.fetch_table()
-        self.items_tree = tk.ttk.Treeview(self.items_scrobable, columns=headers, show="headings")
-        self.items_tree.pack()
 
-        for i, header in enumerate(headers):
+        # Scrollbars
+        y_scroll = ctk.CTkScrollbar(self.view_frame, orientation="vertical")
+        y_scroll.pack(side="right", fill="y")
+
+        x_scroll = ctk.CTkScrollbar(self.view_frame, orientation="horizontal")
+        x_scroll.pack(side="bottom", fill="x")
+
+        # Treeview
+        self.items_tree = tk.ttk.Treeview(
+            self.view_frame,
+            columns=headers,
+            show="headings",
+            yscrollcommand=y_scroll.set,
+            xscrollcommand=x_scroll.set,
+        )
+        self.items_tree.pack(side="left", fill="both", expand=True)
+
+        # connect scrollbars
+        y_scroll.configure(command=self.items_tree.yview)
+        x_scroll.configure(command=self.items_tree.xview)
+
+        for header in headers:
             self.items_tree.heading(header, text=header)
 
         for row in table_data:

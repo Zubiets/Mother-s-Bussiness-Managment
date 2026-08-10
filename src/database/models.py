@@ -7,9 +7,6 @@ import calendar
 
 db: database.Database = None
 
-def fetch_table(table_name):
-    return db.fetch_table(table_name)
-
 class Crud:   # Create(in database module), Read, Update and Delete
     MAIN_TABLE: str = None # table name
 
@@ -18,7 +15,10 @@ class Crud:   # Create(in database module), Read, Update and Delete
 
     @classmethod
     def fetch_table(cls):
-        return db.fetch_table(cls.MAIN_TABLE, columns=list(vars(cls(None, None, None, None, None)).keys())[1:])
+        cursor = db.connection.cursor()
+        cursor.execute(f"SELECT * FROM {cls.MAIN_TABLE} LIMIT 1")
+        columns = [col[0] for col in cursor.description]
+        return db.fetch_table(cls.MAIN_TABLE, columns=columns[1:])
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value):
@@ -58,7 +58,10 @@ class Crud_two_tables:
 
     @classmethod
     def fetch_table(cls):
-        return db.fetch_table(cls.MAIN_TABLE, cls.SECONDARY_TABLE, list(vars(cls(None, None, None, None, None)).keys())[2:])
+        cursor = db.connection.cursor()
+        cursor.execute(f"SELECT * FROM {cls.MAIN_TABLE} LIMIT 1")
+        columns = [col[0] for col in cursor.description]
+        return db.fetch_table(cls.MAIN_TABLE, cls.SECONDARY_TABLE, columns[2:])
 
     @classmethod
     def search_by_parameter(cls, parameter: str, value): # flexible function to read a get query
@@ -100,7 +103,7 @@ class Crud_two_tables:
 class Product(Crud_two_tables):
     MAIN_TABLE = 'products'
     SECONDARY_TABLE = 'categories'
-    def __init__(self, id: int, name: str, category_id: int, price: int, amount: int = 1, state = "ACTIVE", qr_code: str = "", category = ""):
+    def __init__(self, id: int, category_id: int, name: str, price: int, amount: int = 1, state = "ACTIVE", qr_code: str = "", category = ""):
         super()._init_(id)
         self.categories_id = category_id
         self.name = name
@@ -230,13 +233,13 @@ class Loan(Crud_two_tables):
 
     def determine_payments_dates(self, time_intervals: str):
         loan_date = datetime.datetime.strptime(self.date, "%Y/%m/%d")
-        for i in range(1, self.installments):
+        for i in range(self.installments):
             if time_intervals == "SEMANAL": # in spanish to make short some parts of the UI
-                payment_date = loan_date + datetime.timedelta(weeks=i)
+                payment_date = loan_date + datetime.timedelta(weeks=i+1)
             elif time_intervals == "QUINCENAL":
-                payment_date = loan_date + datetime.timedelta(days=15*i)
+                payment_date = loan_date + datetime.timedelta(days=15*i+1)
             elif time_intervals == "MENSUAL":
-                payment_date = dateutil.relativedelta.relativedelta(months=i) # is used the timeutil to make easier the calculate
+                payment_date = dateutil.relativedelta.relativedelta(months=i+1) # is used the timeutil to make easier the calculate
                 payment_date = loan_date + payment_date
             db.execute_query("INSERT INTO installments_details (loans_id, number, date) VALUES (?, ?, ?)", (self.id, i+1, payment_date.strftime("%Y/%m/%d")))
 
@@ -256,7 +259,7 @@ class Task(Crud):
     @staticmethod
     def search_by_month(year: str, month: str):
         month = list(calendar.month_name).index(month)
-        result = db.execute_query(f"SELECT * FROM tasks WHERE strftime('%Y-%m', datetime) = ?", (f"{year}-{month:02d}", )) # the 02d is to fill with a 0 when the number has one digit
+        result = db.execute_query(f"SELECT * FROM tasks WHERE strftime('%Y/%m', datetime) = ?", (f"{year}/{month:02d}", )) # the 02d is to fill with a 0 when the number has one digit
         if result:
             return [Task(*row) for row in result]
         return result
