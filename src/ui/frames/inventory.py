@@ -100,6 +100,8 @@ class InventoryFrame(BaseFrame):
 
     def _section_constr(self, color, clss, headers):
         if self.items_tree:
+            self.y_scroll.destroy()
+            self.x_scroll.destroy()
             self.items_tree.destroy()
 
         self.configure(fg_color=color)
@@ -107,25 +109,25 @@ class InventoryFrame(BaseFrame):
         table_data = clss.fetch_table()
 
         # Scrollbars
-        y_scroll = ctk.CTkScrollbar(self.view_frame, orientation="vertical")
-        y_scroll.pack(side="right", fill="y")
+        self.y_scroll = ctk.CTkScrollbar(self.view_frame, orientation="vertical")
+        self.y_scroll.pack(side="right", fill="y")
 
-        x_scroll = ctk.CTkScrollbar(self.view_frame, orientation="horizontal")
-        x_scroll.pack(side="bottom", fill="x")
+        self.x_scroll = ctk.CTkScrollbar(self.view_frame, orientation="horizontal")
+        self.x_scroll.pack(side="bottom", fill="x")
 
         # Treeview
         self.items_tree = tk.ttk.Treeview(
             self.view_frame,
             columns=headers,
             show="headings",
-            yscrollcommand=y_scroll.set,
-            xscrollcommand=x_scroll.set,
+            yscrollcommand=self.y_scroll.set,
+            xscrollcommand=self.x_scroll.set,
         )
         self.items_tree.pack(side="left", fill="both", expand=True)
 
         # connect scrollbars
-        y_scroll.configure(command=self.items_tree.yview)
-        x_scroll.configure(command=self.items_tree.xview)
+        self.y_scroll.configure(command=self.items_tree.yview)
+        self.x_scroll.configure(command=self.items_tree.xview)
 
         for header in headers:
             self.items_tree.heading(header, text=header)
